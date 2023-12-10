@@ -1,6 +1,6 @@
-PROTO_PATH=./protos
+PROTO_PATH=./quarterback-protos/protos
 GO_PACKAGE_PATH=./api/pb
-GO_PACKAGE_NAME=api/pb
+GO_PACKAGE_NAME=github.com/AhmetSBulbul/quarterback-server/api/pb
 PROTO_FILES = `find $(PROTO_PATH) -name "*.proto"`
 
 gopb:

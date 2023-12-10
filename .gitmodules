@@ -1,0 +1,3 @@
+[submodule "quarterback-protos"]
+	path = quarterback-protos
+	url = https://github.com/AhmetSBulbul/quarterback-protos

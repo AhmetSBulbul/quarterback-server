@@ -1,0 +1,48 @@
+syntax="proto3";
+
+import "common.proto";
+
+package court;
+
+service CourtService {
+    rpc GetCourt(GetCourtRequest) returns (CourtResponse);
+    rpc ListCourtByLocation(ListCourtByLocationRequest) returns (ListCourtResponse);
+    rpc SearchCourt(SearchCourtRequest) returns (ListCourtResponse);
+    // CreateCourt?
+    // AddCourtMedia?
+}
+
+
+
+message Court {
+    int32 id=1;
+    string name=2;
+    int32 districtId=3;
+    string address=4;
+    common.Location location=5;
+    repeated common.Media medias=6;
+}
+
+// Get Court
+message GetCourtRequest {
+    int32 id = 1;
+}
+
+message CourtResponse {
+    Court court=1;
+}
+
+message ListCourtByLocationRequest {
+    common.Location location=1;
+    common.PaginationRequest pagination=2;
+}
+
+message SearchCourtRequest {
+    common.Query query=1;
+    common.PaginationRequest pagination=2;
+}
+
+message ListCourtResponse {
+    repeated Court courts=1;
+    common.PaginationResponse pagination=2;
+}
