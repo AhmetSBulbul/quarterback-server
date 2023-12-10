@@ -28,6 +28,10 @@ type UserServiceClient interface {
 	SearchUsers(ctx context.Context, in *UserSearchRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	UpdateUser(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UploadAvatar(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*UserResponse, error)
+	ToggleFollow(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	ToggleBlock(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	// Report User
+	AddComment(ctx context.Context, in *common.CommentRequest, opts ...grpc.CallOption) (*common.CommentResponse, error)
 }
 
 type userServiceClient struct {
@@ -83,6 +87,33 @@ func (c *userServiceClient) UploadAvatar(ctx context.Context, in *common.File, o
 	return out, nil
 }
 
+func (c *userServiceClient) ToggleFollow(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
+	out := new(FollowResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/ToggleFollow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) ToggleBlock(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
+	out := new(FollowResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/ToggleBlock", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddComment(ctx context.Context, in *common.CommentRequest, opts ...grpc.CallOption) (*common.CommentResponse, error) {
+	out := new(common.CommentResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/AddComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -92,6 +123,10 @@ type UserServiceServer interface {
 	SearchUsers(context.Context, *UserSearchRequest) (*UserListResponse, error)
 	UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error)
 	UploadAvatar(context.Context, *common.File) (*UserResponse, error)
+	ToggleFollow(context.Context, *common.GetByIdRequest) (*FollowResponse, error)
+	ToggleBlock(context.Context, *common.GetByIdRequest) (*FollowResponse, error)
+	// Report User
+	AddComment(context.Context, *common.CommentRequest) (*common.CommentResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -113,6 +148,15 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UserUpdateReq
 }
 func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *common.File) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
+}
+func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *common.GetByIdRequest) (*FollowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
+}
+func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *common.GetByIdRequest) (*FollowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ToggleBlock not implemented")
+}
+func (UnimplementedUserServiceServer) AddComment(context.Context, *common.CommentRequest) (*common.CommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -217,6 +261,60 @@ func _UserService_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_ToggleFollow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ToggleFollow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/ToggleFollow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ToggleFollow(ctx, req.(*common.GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_ToggleBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ToggleBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/ToggleBlock",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ToggleBlock(ctx, req.(*common.GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.CommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/AddComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddComment(ctx, req.(*common.CommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -243,6 +341,18 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadAvatar",
 			Handler:    _UserService_UploadAvatar_Handler,
+		},
+		{
+			MethodName: "ToggleFollow",
+			Handler:    _UserService_ToggleFollow_Handler,
+		},
+		{
+			MethodName: "ToggleBlock",
+			Handler:    _UserService_ToggleBlock_Handler,
+		},
+		{
+			MethodName: "AddComment",
+			Handler:    _UserService_AddComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

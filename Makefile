@@ -3,6 +3,9 @@ GO_PACKAGE_PATH=./api/pb
 GO_PACKAGE_NAME=github.com/AhmetSBulbul/quarterback-server/api/pb
 PROTO_FILES = `find $(PROTO_PATH) -name "*.proto"`
 
+pullpb:
+	git submodule update --remote
+
 gopb:
 	mkdir -p $(GO_PACKAGE_PATH)
 
