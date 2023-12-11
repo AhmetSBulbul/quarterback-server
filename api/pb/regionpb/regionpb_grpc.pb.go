@@ -2,13 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: region.proto
+// source: regionpb.proto
 
-package region
+package regionpb
 
 import (
 	context "context"
-	common "github.com/AhmetSBulbul/quarterback-server/api/pb/common"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/api/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,10 +23,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RegionServiceClient interface {
-	ListCountry(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*CountryListResponse, error)
+	ListCountry(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*CountryListResponse, error)
 	// Should we use query and pagination?
-	ListCity(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*CityListResponse, error)
-	ListDistrict(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*DistrictListResponse, error)
+	ListCity(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*CityListResponse, error)
+	ListDistrict(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*DistrictListResponse, error)
 }
 
 type regionServiceClient struct {
@@ -37,7 +37,7 @@ func NewRegionServiceClient(cc grpc.ClientConnInterface) RegionServiceClient {
 	return &regionServiceClient{cc}
 }
 
-func (c *regionServiceClient) ListCountry(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*CountryListResponse, error) {
+func (c *regionServiceClient) ListCountry(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*CountryListResponse, error) {
 	out := new(CountryListResponse)
 	err := c.cc.Invoke(ctx, "/region.RegionService/ListCountry", in, out, opts...)
 	if err != nil {
@@ -46,7 +46,7 @@ func (c *regionServiceClient) ListCountry(ctx context.Context, in *common.Empty,
 	return out, nil
 }
 
-func (c *regionServiceClient) ListCity(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*CityListResponse, error) {
+func (c *regionServiceClient) ListCity(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*CityListResponse, error) {
 	out := new(CityListResponse)
 	err := c.cc.Invoke(ctx, "/region.RegionService/ListCity", in, out, opts...)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *regionServiceClient) ListCity(ctx context.Context, in *common.GetByIdRe
 	return out, nil
 }
 
-func (c *regionServiceClient) ListDistrict(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*DistrictListResponse, error) {
+func (c *regionServiceClient) ListDistrict(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*DistrictListResponse, error) {
 	out := new(DistrictListResponse)
 	err := c.cc.Invoke(ctx, "/region.RegionService/ListDistrict", in, out, opts...)
 	if err != nil {
@@ -68,10 +68,10 @@ func (c *regionServiceClient) ListDistrict(ctx context.Context, in *common.GetBy
 // All implementations must embed UnimplementedRegionServiceServer
 // for forward compatibility
 type RegionServiceServer interface {
-	ListCountry(context.Context, *common.Empty) (*CountryListResponse, error)
+	ListCountry(context.Context, *commonpb.Empty) (*CountryListResponse, error)
 	// Should we use query and pagination?
-	ListCity(context.Context, *common.GetByIdRequest) (*CityListResponse, error)
-	ListDistrict(context.Context, *common.GetByIdRequest) (*DistrictListResponse, error)
+	ListCity(context.Context, *commonpb.GetByIdRequest) (*CityListResponse, error)
+	ListDistrict(context.Context, *commonpb.GetByIdRequest) (*DistrictListResponse, error)
 	mustEmbedUnimplementedRegionServiceServer()
 }
 
@@ -79,13 +79,13 @@ type RegionServiceServer interface {
 type UnimplementedRegionServiceServer struct {
 }
 
-func (UnimplementedRegionServiceServer) ListCountry(context.Context, *common.Empty) (*CountryListResponse, error) {
+func (UnimplementedRegionServiceServer) ListCountry(context.Context, *commonpb.Empty) (*CountryListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCountry not implemented")
 }
-func (UnimplementedRegionServiceServer) ListCity(context.Context, *common.GetByIdRequest) (*CityListResponse, error) {
+func (UnimplementedRegionServiceServer) ListCity(context.Context, *commonpb.GetByIdRequest) (*CityListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCity not implemented")
 }
-func (UnimplementedRegionServiceServer) ListDistrict(context.Context, *common.GetByIdRequest) (*DistrictListResponse, error) {
+func (UnimplementedRegionServiceServer) ListDistrict(context.Context, *commonpb.GetByIdRequest) (*DistrictListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDistrict not implemented")
 }
 func (UnimplementedRegionServiceServer) mustEmbedUnimplementedRegionServiceServer() {}
@@ -102,7 +102,7 @@ func RegisterRegionServiceServer(s grpc.ServiceRegistrar, srv RegionServiceServe
 }
 
 func _RegionService_ListCountry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.Empty)
+	in := new(commonpb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -114,13 +114,13 @@ func _RegionService_ListCountry_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/region.RegionService/ListCountry",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RegionServiceServer).ListCountry(ctx, req.(*common.Empty))
+		return srv.(RegionServiceServer).ListCountry(ctx, req.(*commonpb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _RegionService_ListCity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -132,13 +132,13 @@ func _RegionService_ListCity_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/region.RegionService/ListCity",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RegionServiceServer).ListCity(ctx, req.(*common.GetByIdRequest))
+		return srv.(RegionServiceServer).ListCity(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _RegionService_ListDistrict_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func _RegionService_ListDistrict_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/region.RegionService/ListDistrict",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RegionServiceServer).ListDistrict(ctx, req.(*common.GetByIdRequest))
+		return srv.(RegionServiceServer).ListDistrict(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -176,5 +176,5 @@ var RegionService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "region.proto",
+	Metadata: "regionpb.proto",
 }

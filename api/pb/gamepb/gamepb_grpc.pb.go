@@ -2,13 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: game.proto
+// source: gamepb.proto
 
-package game
+package gamepb
 
 import (
 	context "context"
-	common "github.com/AhmetSBulbul/quarterback-server/api/pb/common"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/api/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -35,7 +35,7 @@ type GameServiceClient interface {
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
 	CancelGame(ctx context.Context, in *CancelGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
 	// Add Comment
-	AddMedia(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*common.Media, error)
+	AddMedia(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*commonpb.Media, error)
 }
 
 type gameServiceClient struct {
@@ -145,8 +145,8 @@ func (c *gameServiceClient) CancelGame(ctx context.Context, in *CancelGameReques
 	return out, nil
 }
 
-func (c *gameServiceClient) AddMedia(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*common.Media, error) {
-	out := new(common.Media)
+func (c *gameServiceClient) AddMedia(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*commonpb.Media, error) {
+	out := new(commonpb.Media)
 	err := c.cc.Invoke(ctx, "/game.GameService/AddMedia", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ type GameServiceServer interface {
 	EndGame(context.Context, *EndGameRequest) (*GameResponse, error)
 	CancelGame(context.Context, *CancelGameRequest) (*GameResponse, error)
 	// Add Comment
-	AddMedia(context.Context, *common.File) (*common.Media, error)
+	AddMedia(context.Context, *commonpb.File) (*commonpb.Media, error)
 	mustEmbedUnimplementedGameServiceServer()
 }
 
@@ -211,7 +211,7 @@ func (UnimplementedGameServiceServer) EndGame(context.Context, *EndGameRequest) 
 func (UnimplementedGameServiceServer) CancelGame(context.Context, *CancelGameRequest) (*GameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelGame not implemented")
 }
-func (UnimplementedGameServiceServer) AddMedia(context.Context, *common.File) (*common.Media, error) {
+func (UnimplementedGameServiceServer) AddMedia(context.Context, *commonpb.File) (*commonpb.Media, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMedia not implemented")
 }
 func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
@@ -426,7 +426,7 @@ func _GameService_CancelGame_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _GameService_AddMedia_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.File)
+	in := new(commonpb.File)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -438,7 +438,7 @@ func _GameService_AddMedia_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/game.GameService/AddMedia",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).AddMedia(ctx, req.(*common.File))
+		return srv.(GameServiceServer).AddMedia(ctx, req.(*commonpb.File))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -500,5 +500,5 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "game.proto",
+	Metadata: "gamepb.proto",
 }

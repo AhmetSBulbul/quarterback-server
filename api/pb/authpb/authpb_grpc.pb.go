@@ -2,13 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: auth.proto
+// source: authpb.proto
 
-package auth
+package authpb
 
 import (
 	context "context"
-	common "github.com/AhmetSBulbul/quarterback-server/api/pb/common"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/api/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -26,8 +26,8 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Credentials, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Credentials, error)
 	Refresh(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*Credentials, error)
-	SendOtp(ctx context.Context, in *SendOtpRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error)
-	ResetPasswordWithOtp(ctx context.Context, in *ResetPasswordWithOtpRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error)
+	SendOtp(ctx context.Context, in *SendOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
+	ResetPasswordWithOtp(ctx context.Context, in *ResetPasswordWithOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 }
 
 type authServiceClient struct {
@@ -65,8 +65,8 @@ func (c *authServiceClient) Refresh(ctx context.Context, in *RefreshTokenRequest
 	return out, nil
 }
 
-func (c *authServiceClient) SendOtp(ctx context.Context, in *SendOtpRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error) {
-	out := new(common.SuccessResponse)
+func (c *authServiceClient) SendOtp(ctx context.Context, in *SendOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error) {
+	out := new(commonpb.SuccessResponse)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/SendOtp", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,8 +74,8 @@ func (c *authServiceClient) SendOtp(ctx context.Context, in *SendOtpRequest, opt
 	return out, nil
 }
 
-func (c *authServiceClient) ResetPasswordWithOtp(ctx context.Context, in *ResetPasswordWithOtpRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error) {
-	out := new(common.SuccessResponse)
+func (c *authServiceClient) ResetPasswordWithOtp(ctx context.Context, in *ResetPasswordWithOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error) {
+	out := new(commonpb.SuccessResponse)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/ResetPasswordWithOtp", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -90,8 +90,8 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*Credentials, error)
 	Register(context.Context, *RegisterRequest) (*Credentials, error)
 	Refresh(context.Context, *RefreshTokenRequest) (*Credentials, error)
-	SendOtp(context.Context, *SendOtpRequest) (*common.SuccessResponse, error)
-	ResetPasswordWithOtp(context.Context, *ResetPasswordWithOtpRequest) (*common.SuccessResponse, error)
+	SendOtp(context.Context, *SendOtpRequest) (*commonpb.SuccessResponse, error)
+	ResetPasswordWithOtp(context.Context, *ResetPasswordWithOtpRequest) (*commonpb.SuccessResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -108,10 +108,10 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest
 func (UnimplementedAuthServiceServer) Refresh(context.Context, *RefreshTokenRequest) (*Credentials, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
 }
-func (UnimplementedAuthServiceServer) SendOtp(context.Context, *SendOtpRequest) (*common.SuccessResponse, error) {
+func (UnimplementedAuthServiceServer) SendOtp(context.Context, *SendOtpRequest) (*commonpb.SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendOtp not implemented")
 }
-func (UnimplementedAuthServiceServer) ResetPasswordWithOtp(context.Context, *ResetPasswordWithOtpRequest) (*common.SuccessResponse, error) {
+func (UnimplementedAuthServiceServer) ResetPasswordWithOtp(context.Context, *ResetPasswordWithOtpRequest) (*commonpb.SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPasswordWithOtp not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
@@ -246,5 +246,5 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "auth.proto",
+	Metadata: "authpb.proto",
 }

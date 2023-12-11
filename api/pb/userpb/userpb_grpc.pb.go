@@ -2,13 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: user.proto
+// source: userpb.proto
 
-package user
+package userpb
 
 import (
 	context "context"
-	common "github.com/AhmetSBulbul/quarterback-server/api/pb/common"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/api/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,15 +23,15 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	GetMe(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*UserResponse, error)
-	GetUser(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	GetMe(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*UserResponse, error)
+	GetUser(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	SearchUsers(ctx context.Context, in *UserSearchRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	UpdateUser(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserResponse, error)
-	UploadAvatar(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*UserResponse, error)
-	ToggleFollow(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
-	ToggleBlock(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	UploadAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*UserResponse, error)
+	ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
 	// Report User
-	AddComment(ctx context.Context, in *common.CommentRequest, opts ...grpc.CallOption) (*common.CommentResponse, error)
+	AddComment(ctx context.Context, in *commonpb.CommentRequest, opts ...grpc.CallOption) (*commonpb.CommentResponse, error)
 }
 
 type userServiceClient struct {
@@ -42,7 +42,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) GetMe(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *userServiceClient) GetMe(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/GetMe", in, out, opts...)
 	if err != nil {
@@ -51,7 +51,7 @@ func (c *userServiceClient) GetMe(ctx context.Context, in *common.Empty, opts ..
 	return out, nil
 }
 
-func (c *userServiceClient) GetUser(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *userServiceClient) GetUser(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/GetUser", in, out, opts...)
 	if err != nil {
@@ -78,7 +78,7 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UserUpdateReques
 	return out, nil
 }
 
-func (c *userServiceClient) UploadAvatar(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *userServiceClient) UploadAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/UploadAvatar", in, out, opts...)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *userServiceClient) UploadAvatar(ctx context.Context, in *common.File, o
 	return out, nil
 }
 
-func (c *userServiceClient) ToggleFollow(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
+func (c *userServiceClient) ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
 	out := new(FollowResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/ToggleFollow", in, out, opts...)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *userServiceClient) ToggleFollow(ctx context.Context, in *common.GetById
 	return out, nil
 }
 
-func (c *userServiceClient) ToggleBlock(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
+func (c *userServiceClient) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
 	out := new(FollowResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/ToggleBlock", in, out, opts...)
 	if err != nil {
@@ -105,8 +105,8 @@ func (c *userServiceClient) ToggleBlock(ctx context.Context, in *common.GetByIdR
 	return out, nil
 }
 
-func (c *userServiceClient) AddComment(ctx context.Context, in *common.CommentRequest, opts ...grpc.CallOption) (*common.CommentResponse, error) {
-	out := new(common.CommentResponse)
+func (c *userServiceClient) AddComment(ctx context.Context, in *commonpb.CommentRequest, opts ...grpc.CallOption) (*commonpb.CommentResponse, error) {
+	out := new(commonpb.CommentResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/AddComment", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -118,15 +118,15 @@ func (c *userServiceClient) AddComment(ctx context.Context, in *common.CommentRe
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	GetMe(context.Context, *common.Empty) (*UserResponse, error)
-	GetUser(context.Context, *common.GetByIdRequest) (*UserResponse, error)
+	GetMe(context.Context, *commonpb.Empty) (*UserResponse, error)
+	GetUser(context.Context, *commonpb.GetByIdRequest) (*UserResponse, error)
 	SearchUsers(context.Context, *UserSearchRequest) (*UserListResponse, error)
 	UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error)
-	UploadAvatar(context.Context, *common.File) (*UserResponse, error)
-	ToggleFollow(context.Context, *common.GetByIdRequest) (*FollowResponse, error)
-	ToggleBlock(context.Context, *common.GetByIdRequest) (*FollowResponse, error)
+	UploadAvatar(context.Context, *commonpb.File) (*UserResponse, error)
+	ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
+	ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
 	// Report User
-	AddComment(context.Context, *common.CommentRequest) (*common.CommentResponse, error)
+	AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -134,10 +134,10 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) GetMe(context.Context, *common.Empty) (*UserResponse, error) {
+func (UnimplementedUserServiceServer) GetMe(context.Context, *commonpb.Empty) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMe not implemented")
 }
-func (UnimplementedUserServiceServer) GetUser(context.Context, *common.GetByIdRequest) (*UserResponse, error) {
+func (UnimplementedUserServiceServer) GetUser(context.Context, *commonpb.GetByIdRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedUserServiceServer) SearchUsers(context.Context, *UserSearchRequest) (*UserListResponse, error) {
@@ -146,16 +146,16 @@ func (UnimplementedUserServiceServer) SearchUsers(context.Context, *UserSearchRe
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *common.File) (*UserResponse, error) {
+func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *commonpb.File) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
 }
-func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *common.GetByIdRequest) (*FollowResponse, error) {
+func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
 }
-func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *common.GetByIdRequest) (*FollowResponse, error) {
+func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleBlock not implemented")
 }
-func (UnimplementedUserServiceServer) AddComment(context.Context, *common.CommentRequest) (*common.CommentResponse, error) {
+func (UnimplementedUserServiceServer) AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
@@ -172,7 +172,7 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 }
 
 func _UserService_GetMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.Empty)
+	in := new(commonpb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -184,13 +184,13 @@ func _UserService_GetMe_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/user.UserService/GetMe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetMe(ctx, req.(*common.Empty))
+		return srv.(UserServiceServer).GetMe(ctx, req.(*commonpb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/user.UserService/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUser(ctx, req.(*common.GetByIdRequest))
+		return srv.(UserServiceServer).GetUser(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -244,7 +244,7 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _UserService_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.File)
+	in := new(commonpb.File)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -256,13 +256,13 @@ func _UserService_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/user.UserService/UploadAvatar",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UploadAvatar(ctx, req.(*common.File))
+		return srv.(UserServiceServer).UploadAvatar(ctx, req.(*commonpb.File))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_ToggleFollow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -274,13 +274,13 @@ func _UserService_ToggleFollow_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/user.UserService/ToggleFollow",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).ToggleFollow(ctx, req.(*common.GetByIdRequest))
+		return srv.(UserServiceServer).ToggleFollow(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_ToggleBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -292,13 +292,13 @@ func _UserService_ToggleBlock_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/user.UserService/ToggleBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).ToggleBlock(ctx, req.(*common.GetByIdRequest))
+		return srv.(UserServiceServer).ToggleBlock(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.CommentRequest)
+	in := new(commonpb.CommentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func _UserService_AddComment_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/user.UserService/AddComment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).AddComment(ctx, req.(*common.CommentRequest))
+		return srv.(UserServiceServer).AddComment(ctx, req.(*commonpb.CommentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -356,5 +356,5 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "user.proto",
+	Metadata: "userpb.proto",
 }

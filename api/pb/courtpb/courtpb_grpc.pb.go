@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: court.proto
+// source: courtpb.proto
 
-package court
+package courtpb
 
 import (
 	context "context"
@@ -173,5 +173,5 @@ var CourtService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "court.proto",
+	Metadata: "courtpb.proto",
 }

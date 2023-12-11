@@ -2,13 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: team.proto
+// source: teampb.proto
 
-package team
+package teampb
 
 import (
 	context "context"
-	common "github.com/AhmetSBulbul/quarterback-server/api/pb/common"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/api/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,18 +23,18 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamServiceClient interface {
-	GetTeam(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
-	GetTeamWithPlayers(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamWithPlayers, error)
+	GetTeam(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
+	GetTeamWithPlayers(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamWithPlayers, error)
 	ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamResponse, error)
 	CreateTeam(ctx context.Context, in *CreateTeamRequest, opts ...grpc.CallOption) (*TeamResponse, error)
 	UpdateTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*TeamResponse, error)
-	UpdateTeamAvatar(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*TeamResponse, error)
-	InvitePlayer(ctx context.Context, in *InvitePlayerRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error)
+	UpdateTeamAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*TeamResponse, error)
+	InvitePlayer(ctx context.Context, in *InvitePlayerRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*TeamResponse, error)
-	AssignCaptain(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
-	LeaveTeam(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*TeamResponse, error)
-	KickPlayer(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
-	DeleteTeam(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.SuccessResponse, error)
+	AssignCaptain(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
+	LeaveTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*TeamResponse, error)
+	KickPlayer(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
+	DeleteTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 }
 
 type teamServiceClient struct {
@@ -45,7 +45,7 @@ func NewTeamServiceClient(cc grpc.ClientConnInterface) TeamServiceClient {
 	return &teamServiceClient{cc}
 }
 
-func (c *teamServiceClient) GetTeam(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) GetTeam(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/GetTeam", in, out, opts...)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *teamServiceClient) GetTeam(ctx context.Context, in *common.GetByIdReque
 	return out, nil
 }
 
-func (c *teamServiceClient) GetTeamWithPlayers(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamWithPlayers, error) {
+func (c *teamServiceClient) GetTeamWithPlayers(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamWithPlayers, error) {
 	out := new(TeamWithPlayers)
 	err := c.cc.Invoke(ctx, "/team.TeamService/GetTeamWithPlayers", in, out, opts...)
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *teamServiceClient) UpdateTeam(ctx context.Context, in *Team, opts ...gr
 	return out, nil
 }
 
-func (c *teamServiceClient) UpdateTeamAvatar(ctx context.Context, in *common.File, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) UpdateTeamAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/UpdateTeamAvatar", in, out, opts...)
 	if err != nil {
@@ -99,8 +99,8 @@ func (c *teamServiceClient) UpdateTeamAvatar(ctx context.Context, in *common.Fil
 	return out, nil
 }
 
-func (c *teamServiceClient) InvitePlayer(ctx context.Context, in *InvitePlayerRequest, opts ...grpc.CallOption) (*common.SuccessResponse, error) {
-	out := new(common.SuccessResponse)
+func (c *teamServiceClient) InvitePlayer(ctx context.Context, in *InvitePlayerRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error) {
+	out := new(commonpb.SuccessResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/InvitePlayer", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (c *teamServiceClient) AcceptInvite(ctx context.Context, in *AcceptInviteRe
 	return out, nil
 }
 
-func (c *teamServiceClient) AssignCaptain(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) AssignCaptain(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/AssignCaptain", in, out, opts...)
 	if err != nil {
@@ -126,7 +126,7 @@ func (c *teamServiceClient) AssignCaptain(ctx context.Context, in *common.GetByI
 	return out, nil
 }
 
-func (c *teamServiceClient) LeaveTeam(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) LeaveTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/LeaveTeam", in, out, opts...)
 	if err != nil {
@@ -135,7 +135,7 @@ func (c *teamServiceClient) LeaveTeam(ctx context.Context, in *common.Empty, opt
 	return out, nil
 }
 
-func (c *teamServiceClient) KickPlayer(ctx context.Context, in *common.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) KickPlayer(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/KickPlayer", in, out, opts...)
 	if err != nil {
@@ -144,8 +144,8 @@ func (c *teamServiceClient) KickPlayer(ctx context.Context, in *common.GetByIdRe
 	return out, nil
 }
 
-func (c *teamServiceClient) DeleteTeam(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.SuccessResponse, error) {
-	out := new(common.SuccessResponse)
+func (c *teamServiceClient) DeleteTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error) {
+	out := new(commonpb.SuccessResponse)
 	err := c.cc.Invoke(ctx, "/team.TeamService/DeleteTeam", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -157,18 +157,18 @@ func (c *teamServiceClient) DeleteTeam(ctx context.Context, in *common.Empty, op
 // All implementations must embed UnimplementedTeamServiceServer
 // for forward compatibility
 type TeamServiceServer interface {
-	GetTeam(context.Context, *common.GetByIdRequest) (*TeamResponse, error)
-	GetTeamWithPlayers(context.Context, *common.GetByIdRequest) (*TeamWithPlayers, error)
+	GetTeam(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
+	GetTeamWithPlayers(context.Context, *commonpb.GetByIdRequest) (*TeamWithPlayers, error)
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamResponse, error)
 	CreateTeam(context.Context, *CreateTeamRequest) (*TeamResponse, error)
 	UpdateTeam(context.Context, *Team) (*TeamResponse, error)
-	UpdateTeamAvatar(context.Context, *common.File) (*TeamResponse, error)
-	InvitePlayer(context.Context, *InvitePlayerRequest) (*common.SuccessResponse, error)
+	UpdateTeamAvatar(context.Context, *commonpb.File) (*TeamResponse, error)
+	InvitePlayer(context.Context, *InvitePlayerRequest) (*commonpb.SuccessResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*TeamResponse, error)
-	AssignCaptain(context.Context, *common.GetByIdRequest) (*TeamResponse, error)
-	LeaveTeam(context.Context, *common.Empty) (*TeamResponse, error)
-	KickPlayer(context.Context, *common.GetByIdRequest) (*TeamResponse, error)
-	DeleteTeam(context.Context, *common.Empty) (*common.SuccessResponse, error)
+	AssignCaptain(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
+	LeaveTeam(context.Context, *commonpb.Empty) (*TeamResponse, error)
+	KickPlayer(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
+	DeleteTeam(context.Context, *commonpb.Empty) (*commonpb.SuccessResponse, error)
 	mustEmbedUnimplementedTeamServiceServer()
 }
 
@@ -176,10 +176,10 @@ type TeamServiceServer interface {
 type UnimplementedTeamServiceServer struct {
 }
 
-func (UnimplementedTeamServiceServer) GetTeam(context.Context, *common.GetByIdRequest) (*TeamResponse, error) {
+func (UnimplementedTeamServiceServer) GetTeam(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
 }
-func (UnimplementedTeamServiceServer) GetTeamWithPlayers(context.Context, *common.GetByIdRequest) (*TeamWithPlayers, error) {
+func (UnimplementedTeamServiceServer) GetTeamWithPlayers(context.Context, *commonpb.GetByIdRequest) (*TeamWithPlayers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamWithPlayers not implemented")
 }
 func (UnimplementedTeamServiceServer) ListTeam(context.Context, *ListTeamRequest) (*ListTeamResponse, error) {
@@ -191,25 +191,25 @@ func (UnimplementedTeamServiceServer) CreateTeam(context.Context, *CreateTeamReq
 func (UnimplementedTeamServiceServer) UpdateTeam(context.Context, *Team) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeam not implemented")
 }
-func (UnimplementedTeamServiceServer) UpdateTeamAvatar(context.Context, *common.File) (*TeamResponse, error) {
+func (UnimplementedTeamServiceServer) UpdateTeamAvatar(context.Context, *commonpb.File) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeamAvatar not implemented")
 }
-func (UnimplementedTeamServiceServer) InvitePlayer(context.Context, *InvitePlayerRequest) (*common.SuccessResponse, error) {
+func (UnimplementedTeamServiceServer) InvitePlayer(context.Context, *InvitePlayerRequest) (*commonpb.SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InvitePlayer not implemented")
 }
 func (UnimplementedTeamServiceServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptInvite not implemented")
 }
-func (UnimplementedTeamServiceServer) AssignCaptain(context.Context, *common.GetByIdRequest) (*TeamResponse, error) {
+func (UnimplementedTeamServiceServer) AssignCaptain(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignCaptain not implemented")
 }
-func (UnimplementedTeamServiceServer) LeaveTeam(context.Context, *common.Empty) (*TeamResponse, error) {
+func (UnimplementedTeamServiceServer) LeaveTeam(context.Context, *commonpb.Empty) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LeaveTeam not implemented")
 }
-func (UnimplementedTeamServiceServer) KickPlayer(context.Context, *common.GetByIdRequest) (*TeamResponse, error) {
+func (UnimplementedTeamServiceServer) KickPlayer(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method KickPlayer not implemented")
 }
-func (UnimplementedTeamServiceServer) DeleteTeam(context.Context, *common.Empty) (*common.SuccessResponse, error) {
+func (UnimplementedTeamServiceServer) DeleteTeam(context.Context, *commonpb.Empty) (*commonpb.SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
 }
 func (UnimplementedTeamServiceServer) mustEmbedUnimplementedTeamServiceServer() {}
@@ -226,7 +226,7 @@ func RegisterTeamServiceServer(s grpc.ServiceRegistrar, srv TeamServiceServer) {
 }
 
 func _TeamService_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -238,13 +238,13 @@ func _TeamService_GetTeam_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/team.TeamService/GetTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeam(ctx, req.(*common.GetByIdRequest))
+		return srv.(TeamServiceServer).GetTeam(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_GetTeamWithPlayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func _TeamService_GetTeamWithPlayers_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/team.TeamService/GetTeamWithPlayers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).GetTeamWithPlayers(ctx, req.(*common.GetByIdRequest))
+		return srv.(TeamServiceServer).GetTeamWithPlayers(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -316,7 +316,7 @@ func _TeamService_UpdateTeam_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _TeamService_UpdateTeamAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.File)
+	in := new(commonpb.File)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -328,7 +328,7 @@ func _TeamService_UpdateTeamAvatar_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/team.TeamService/UpdateTeamAvatar",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).UpdateTeamAvatar(ctx, req.(*common.File))
+		return srv.(TeamServiceServer).UpdateTeamAvatar(ctx, req.(*commonpb.File))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -370,7 +370,7 @@ func _TeamService_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _TeamService_AssignCaptain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -382,13 +382,13 @@ func _TeamService_AssignCaptain_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/team.TeamService/AssignCaptain",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).AssignCaptain(ctx, req.(*common.GetByIdRequest))
+		return srv.(TeamServiceServer).AssignCaptain(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_LeaveTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.Empty)
+	in := new(commonpb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -400,13 +400,13 @@ func _TeamService_LeaveTeam_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/team.TeamService/LeaveTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).LeaveTeam(ctx, req.(*common.Empty))
+		return srv.(TeamServiceServer).LeaveTeam(ctx, req.(*commonpb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_KickPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.GetByIdRequest)
+	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -418,13 +418,13 @@ func _TeamService_KickPlayer_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/team.TeamService/KickPlayer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).KickPlayer(ctx, req.(*common.GetByIdRequest))
+		return srv.(TeamServiceServer).KickPlayer(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _TeamService_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(common.Empty)
+	in := new(commonpb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -436,7 +436,7 @@ func _TeamService_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/team.TeamService/DeleteTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).DeleteTeam(ctx, req.(*common.Empty))
+		return srv.(TeamServiceServer).DeleteTeam(ctx, req.(*commonpb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -498,5 +498,5 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "team.proto",
+	Metadata: "teampb.proto",
 }
