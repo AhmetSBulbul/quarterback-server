@@ -31,7 +31,7 @@ type TeamServiceClient interface {
 	UpdateTeamAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*TeamResponse, error)
 	InvitePlayer(ctx context.Context, in *InvitePlayerRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*TeamResponse, error)
-	AssignCaptain(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
+	AssignAdmin(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
 	LeaveTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*TeamResponse, error)
 	KickPlayer(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error)
 	DeleteTeam(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
@@ -117,9 +117,9 @@ func (c *teamServiceClient) AcceptInvite(ctx context.Context, in *AcceptInviteRe
 	return out, nil
 }
 
-func (c *teamServiceClient) AssignCaptain(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
+func (c *teamServiceClient) AssignAdmin(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*TeamResponse, error) {
 	out := new(TeamResponse)
-	err := c.cc.Invoke(ctx, "/team.TeamService/AssignCaptain", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/team.TeamService/AssignAdmin", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ type TeamServiceServer interface {
 	UpdateTeamAvatar(context.Context, *commonpb.File) (*TeamResponse, error)
 	InvitePlayer(context.Context, *InvitePlayerRequest) (*commonpb.SuccessResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*TeamResponse, error)
-	AssignCaptain(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
+	AssignAdmin(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
 	LeaveTeam(context.Context, *commonpb.Empty) (*TeamResponse, error)
 	KickPlayer(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error)
 	DeleteTeam(context.Context, *commonpb.Empty) (*commonpb.SuccessResponse, error)
@@ -200,8 +200,8 @@ func (UnimplementedTeamServiceServer) InvitePlayer(context.Context, *InvitePlaye
 func (UnimplementedTeamServiceServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptInvite not implemented")
 }
-func (UnimplementedTeamServiceServer) AssignCaptain(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AssignCaptain not implemented")
+func (UnimplementedTeamServiceServer) AssignAdmin(context.Context, *commonpb.GetByIdRequest) (*TeamResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssignAdmin not implemented")
 }
 func (UnimplementedTeamServiceServer) LeaveTeam(context.Context, *commonpb.Empty) (*TeamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LeaveTeam not implemented")
@@ -369,20 +369,20 @@ func _TeamService_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamService_AssignCaptain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TeamService_AssignAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamServiceServer).AssignCaptain(ctx, in)
+		return srv.(TeamServiceServer).AssignAdmin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/team.TeamService/AssignCaptain",
+		FullMethod: "/team.TeamService/AssignAdmin",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamServiceServer).AssignCaptain(ctx, req.(*commonpb.GetByIdRequest))
+		return srv.(TeamServiceServer).AssignAdmin(ctx, req.(*commonpb.GetByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -481,8 +481,8 @@ var TeamService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TeamService_AcceptInvite_Handler,
 		},
 		{
-			MethodName: "AssignCaptain",
-			Handler:    _TeamService_AssignCaptain_Handler,
+			MethodName: "AssignAdmin",
+			Handler:    _TeamService_AssignAdmin_Handler,
 		},
 		{
 			MethodName: "LeaveTeam",

@@ -26,6 +26,7 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Credentials, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Credentials, error)
 	Refresh(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*Credentials, error)
+	// Send reset token to email
 	SendOtp(ctx context.Context, in *SendOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 	ResetPasswordWithOtp(ctx context.Context, in *ResetPasswordWithOtpRequest, opts ...grpc.CallOption) (*commonpb.SuccessResponse, error)
 }
@@ -90,6 +91,7 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*Credentials, error)
 	Register(context.Context, *RegisterRequest) (*Credentials, error)
 	Refresh(context.Context, *RefreshTokenRequest) (*Credentials, error)
+	// Send reset token to email
 	SendOtp(context.Context, *SendOtpRequest) (*commonpb.SuccessResponse, error)
 	ResetPasswordWithOtp(context.Context, *ResetPasswordWithOtpRequest) (*commonpb.SuccessResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
