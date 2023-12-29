@@ -1,35 +1,19 @@
--- INSERT INTO user 
--- (
---     id,
---     email,
---     password,
---     username
--- )
--- VALUES
--- (
---     1,
---     'admin@example.org',
---     /* 152535 */
---     '$2a$12$LKJcgPyUn4HUuNCGQ6kIBe1WBIIN6uCtHJDDC8W2MXsDwBKNHGKW.',
---     'admin'
--- )
-
 INSERT INTO country 
 (
     id,
-    name,
+    name
 )
 VALUES
 (
     1,
     'Turkey'
-)
+);
 
 INSERT INTO city 
 (
     id,
     name,
-    country_id
+    countryID
 )
 VALUES
 (
@@ -41,14 +25,14 @@ VALUES
     2,
     'Antalya',
     1
-)
+);
 
 
 INSERT INTO district
 (
     id,
     name,
-    city_id
+    cityID
 )
 VALUES
 (
@@ -70,4 +54,4 @@ VALUES
     4,
     'Muratpasa',
     2
-)
+);

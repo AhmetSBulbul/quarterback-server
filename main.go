@@ -2,11 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/AhmetSBulbul/quarterback-server/gapi"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
@@ -28,19 +28,21 @@ func main() {
 	}
 	db.SetConnMaxLifetime(time.Minute)
 
-	var (
-		id       int
-		username string
-		password string
-	)
+	gapi.NewServer(db)
 
-	row := db.QueryRow("SELECT id, username, password FROM user WHERE username = ?", "admin")
-	err = row.Scan(&id, &username, &password)
+	// var (
+	// 	id       int
+	// 	username string
+	// 	password string
+	// )
 
-	if err != nil {
-		log.Printf("[main] scan error: %v", err.Error())
-	}
+	// row := db.QueryRow("SELECT id, username, password FROM user WHERE username = ?", "admin")
+	// err = row.Scan(&id, &username, &password)
+
+	// if err != nil {
+	// 	log.Printf("[main] scan error: %v", err.Error())
+	// }
 
 	// fmt.Printf("%s\n", ghostUser.String())
-	fmt.Printf("admin user:\nid:%d,\nusername:%s,\npassword:%s\n", id, username, password)
+	// fmt.Printf("admin user:\nid:%d,\nusername:%s,\npassword:%s\n", id, username, password)
 }

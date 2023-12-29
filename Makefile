@@ -1,11 +1,11 @@
 PROTO_PATH=./quarterback-protos/protos
-GO_PACKAGE_PATH=./api/pb
-GO_PACKAGE_NAME=github.com/AhmetSBulbul/quarterback-server/api/pb
+GO_PACKAGE_PATH=./pb
+GO_PACKAGE_NAME=github.com/AhmetSBulbul/quarterback-server/pb
 PROTO_FILES = `find $(PROTO_PATH) -name "*.proto"`
 PACKAGE_PREFIX = pb
 
 pullpb:
-	git submodule update --remote
+	git submodule update --remote --init --recursive
 
 clearpb:
 	rm -rf $(GO_PACKAGE_PATH)
