@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net"
+	"os"
 
 	"github.com/AhmetSBulbul/quarterback-server/pb/authpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/regionpb"
@@ -25,7 +26,7 @@ func NewServer(db *sql.DB) {
 	authpb.RegisterAuthServiceServer(s, &AuthService{db: db})
 	regionpb.RegisterRegionServiceServer(s, &RegionService{db: db})
 
-	lis, err := net.Listen("tcp", ":50000")
+	lis, err := net.Listen("tcp", os.Getenv("LISTEN_ADDR"))
 	if err != nil {
 		panic(err)
 	}
