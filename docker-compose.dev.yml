@@ -24,4 +24,4 @@ services:
       MYSQL_PASSWORD: "152535"
       MYSQL_ROOT_PASSWORD: "152535"
     volumes:
-       - ./volumes/data:/var/lib/mysql
+       - ./.volumes/data:/var/lib/mysql
