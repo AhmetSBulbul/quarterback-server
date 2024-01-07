@@ -14,7 +14,6 @@ services:
  database:
     build:
      context: ./database
-     dockerfile: db.Dockerfile
     restart: unless-stopped
     ports: 
       - "33061:3306"
