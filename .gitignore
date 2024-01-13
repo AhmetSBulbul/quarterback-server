@@ -3,3 +3,4 @@ volumes
 bin
 .env
 .DS_Store
+vendor

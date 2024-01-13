@@ -25,9 +25,8 @@ message RegisterRequest {
     string email = 1;
     string username = 2;
     string password = 3;
-    string passwordValidate = 4;
     string name = 5;
-    string lastname = 6;
+    string lastName = 6;
     int32 districtId = 7;
 }
 

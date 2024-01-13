@@ -3,19 +3,23 @@ package gapi
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/AhmetSBulbul/quarterback-server/helpers"
 	"github.com/AhmetSBulbul/quarterback-server/pb/authpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
+	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 )
 
 type AuthService struct {
-	db *sql.DB
+	db       *sql.DB
+	validate *validator.Validate
 	authpb.UnimplementedAuthServiceServer
 }
 
@@ -85,8 +89,33 @@ func (a *AuthService) Login(ctx context.Context, in *authpb.LoginRequest) (*auth
 	}, nil
 }
 
-func (a *AuthService) Register(_ context.Context, _ *authpb.RegisterRequest) (*authpb.Credentials, error) {
-	panic("not implemented") // TODO: Implement
+func (a *AuthService) Register(ctx context.Context, in *authpb.RegisterRequest) (*authpb.Credentials, error) {
+	type ValidatedRegister struct {
+		Email      string `validate:"required,email"`
+		Username   string `validate:"required,alphanumunicode"`
+		Password   string `validate:"required,min=8"`
+		Name       string `validate:"required,alphanumunicode"`
+		LastName   string `validate:"required,alphanumunicode"`
+		DistrictId int32  `validate:"required"`
+	}
+
+	v := &ValidatedRegister{}
+	m, _ := json.Marshal(in)
+	json.Unmarshal(m, v)
+	validationErr := a.validate.StructCtx(ctx, v)
+
+	if validationErr != nil {
+		return nil, gerr(codes.InvalidArgument, validationErr)
+	}
+
+	var User userpb.User
+
+	accessToken, refreshToken, err := a.genTokens(user.id)
+
+	return &authpb.Credentials{
+		Token:        accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (a *AuthService) Refresh(_ context.Context, _ *authpb.RefreshTokenRequest) (*authpb.Credentials, error) {

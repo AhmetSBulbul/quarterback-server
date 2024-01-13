@@ -38,6 +38,9 @@ goapi_linux:
 goapi_macos:
 	cd api; mkdir -p bin; env GOOS=darwin GOARCH=arm64 go build -o bin/api
 
+dev:
+	go run main.go
+
 install:
 	apt-get update
 	apt-get install -y protobuf-compiler
