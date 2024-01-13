@@ -20,8 +20,9 @@ var validate *validator.Validate
 func gerr(c codes.Code, err error) error {
 	if err != nil {
 		log.Printf("%v", err)
+		return status.Errorf(c, err.Error())
 	}
-	return status.Errorf(c, err.Error())
+	return status.Errorf(c, "unknown error")
 }
 
 func NewServer(db *sql.DB) {

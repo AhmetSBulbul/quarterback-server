@@ -4,13 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/AhmetSBulbul/quarterback-server/helpers"
 	"github.com/AhmetSBulbul/quarterback-server/pb/authpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
-	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
@@ -23,7 +21,7 @@ type AuthService struct {
 	authpb.UnimplementedAuthServiceServer
 }
 
-func (a *AuthService) genTokens(sub string, sub_id string) (string, string, error) {
+func (a *AuthService) genTokens(sub string, sub_id int) (string, string, error) {
 	accessToken, err := helpers.CreateJWT(jwt.MapClaims{
 		"sub":    sub,
 		"sub_id": sub_id,
@@ -50,7 +48,7 @@ func (a *AuthService) genTokens(sub string, sub_id string) (string, string, erro
 		return "", "", gerr(codes.Internal, err)
 	}
 
-	// Bu burada olmayacak, refresh yapinca eklenecek...
+	// TODO: Redis'e ekleme
 	// ctx := context.Background()
 	// err = s.redis.Set(ctx, sub_id, refresh_jti_str, refreshTTL).Err()
 	// if err != nil {
@@ -78,13 +76,14 @@ func (a *AuthService) Login(ctx context.Context, in *authpb.LoginRequest) (*auth
 		return nil, gerr(codes.Unauthenticated, nil)
 	}
 
-	accessToken, refreshToken, err := a.genTokens(username, fmt.Sprintf("%d", id))
+	accessToken, refreshToken, err := a.genTokens(username, id)
 	if err != nil {
 		return nil, err
 	}
 
 	return &authpb.Credentials{
-		Token:        accessToken,
+		Token: accessToken,
+
 		RefreshToken: refreshToken,
 	}, nil
 }
@@ -108,9 +107,26 @@ func (a *AuthService) Register(ctx context.Context, in *authpb.RegisterRequest) 
 		return nil, gerr(codes.InvalidArgument, validationErr)
 	}
 
-	var User userpb.User
+	result, err := a.db.Exec(
+		"INSERT INTO user (email, password, name, lastName, username, districtID) VALUES (?, ?, ?, ?, ?, ?)",
+		v.Email,
+		helpers.HashPassword(v.Password),
+		v.Name,
+		v.LastName,
+		v.Username,
+		v.DistrictId,
+	)
 
-	accessToken, refreshToken, err := a.genTokens(user.id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	id, _ := result.LastInsertId()
+
+	accessToken, refreshToken, err := a.genTokens(v.Username, int(id))
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
 
 	return &authpb.Credentials{
 		Token:        accessToken,
@@ -118,8 +134,27 @@ func (a *AuthService) Register(ctx context.Context, in *authpb.RegisterRequest) 
 	}, nil
 }
 
-func (a *AuthService) Refresh(_ context.Context, _ *authpb.RefreshTokenRequest) (*authpb.Credentials, error) {
-	panic("not implemented") // TODO: Implement
+// TODO: Guvenlik ekstralari, refresh token jti kontrol ve yenileme (redis)
+func (a *AuthService) Refresh(ctx context.Context, in *authpb.RefreshTokenRequest) (*authpb.Credentials, error) {
+	token, err := helpers.ValidateJWT(in.RefreshToken)
+	if err != nil {
+		return nil, gerr(codes.Unauthenticated, err)
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	if claims["typ"] != "refresh" {
+		return nil, gerr(codes.Unauthenticated, nil)
+	}
+
+	accessToken, refreshToken, err := a.genTokens(claims["sub"].(string), int(claims["sub_id"].(float64)))
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &authpb.Credentials{
+		Token:        accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 // Send reset token to email
