@@ -8,13 +8,16 @@ import (
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type UserService struct {
 	db *sql.DB
 	userpb.UnimplementedUserServiceServer
 	validate *validator.Validate
+}
+
+func getUserIdFromCtx(ctx context.Context) int {
+	return ctx.Value(Sub_id("sub_id")).(int)
 }
 
 func (s *UserService) getUserByID(ctx context.Context, userid int) (*userpb.User, error) {
@@ -57,7 +60,7 @@ func (s *UserService) getUserBySearch(ctx context.Context, query string) ([]*use
 }
 
 func (s *UserService) GetMe(ctx context.Context, in *commonpb.Empty) (*userpb.UserResponse, error) {
-	var sub_id = ctx.Value(Sub_id("sub_id")).(int)
+	var sub_id = getUserIdFromCtx(ctx)
 	user, err := s.getUserByID(ctx, sub_id)
 
 	if err != nil {
@@ -97,7 +100,7 @@ func (s *UserService) SearchUsers(ctx context.Context, in *userpb.UserSearchRequ
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, in *userpb.UserUpdateRequest) (*userpb.UserResponse, error) {
-	sub_id := ctx.Value(Sub_id("sub_id")).(int)
+	sub_id := getUserIdFromCtx(ctx)
 
 	var user userpb.User
 	row := s.db.QueryRowContext(ctx, "SELECT id, name, lastName, districtID FROM user WHERE id = ?", sub_id)
@@ -137,16 +140,120 @@ func (s *UserService) UpdateUser(ctx context.Context, in *userpb.UserUpdateReque
 	}, nil
 }
 
-func (s *UserService) UploadAvatar(ctx context.Context, in *commonpb.File) (*userpb.UserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
+func (s *UserService) UploadAvatar(ctx context.Context, in *userpb.UpdateAvatarRequest) (*userpb.UserResponse, error) {
+	sub_id := getUserIdFromCtx(ctx)
+	fileId := in.GetAvatarFileId()
+
+	query := "UPDATE user SET avatarID = ? WHERE id = ?"
+	_, err := s.db.ExecContext(ctx, query, fileId, sub_id)
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	updatedUser, err := s.getUserByID(ctx, sub_id)
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &userpb.UserResponse{
+		User: updatedUser,
+	}, nil
 }
 
 func (s *UserService) ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest) (*userpb.FollowResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
+	sub_id := getUserIdFromCtx(ctx)
+
+	rows := s.db.QueryRowContext(ctx, "SELECT followingID FROM follower WHERE followerID = ? AND followingID = ?", sub_id, in.Id)
+
+	var followingID int
+	err := rows.Scan(&followingID)
+
+	if err != nil && err != sql.ErrNoRows {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	if err == sql.ErrNoRows {
+		_, err := s.db.ExecContext(ctx, "INSERT INTO follower (followerID, followingID) VALUES (?, ?)", sub_id, in.Id)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		return &userpb.FollowResponse{
+			IsFollowing:   true,
+			SubjectUserID: in.Id,
+		}, nil
+	}
+
+	_, err = s.db.ExecContext(ctx, "DELETE FROM follower WHERE followerID = ? AND followingID = ?", sub_id, in.Id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &userpb.FollowResponse{
+		IsFollowing:   false,
+		SubjectUserID: in.Id,
+	}, nil
 }
-func (s *UserService) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest) (*userpb.FollowResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ToggleBlock not implemented")
+
+func (s *UserService) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest) (*userpb.BlockResponse, error) {
+	sub_id := getUserIdFromCtx(ctx)
+
+	rows := s.db.QueryRowContext(ctx, "SELECT blockedID FROM block WHERE blockerID = ? AND blockedID = ?", sub_id, in.Id)
+
+	var blockedID int
+	err := rows.Scan(&blockedID)
+
+	if err != nil && err != sql.ErrNoRows {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	if err == sql.ErrNoRows {
+		_, err := s.db.ExecContext(ctx, "INSERT INTO block (blockerID, blockedID) VALUES (?, ?)", sub_id, in.Id)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		return &userpb.BlockResponse{
+			IsBlocked:     true,
+			SubjectUserID: in.Id,
+		}, nil
+	}
+
+	_, err = s.db.ExecContext(ctx, "DELETE FROM block WHERE blockerID = ? AND blockedID = ?", sub_id, in.Id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &userpb.BlockResponse{
+		IsBlocked:     false,
+		SubjectUserID: in.Id,
+	}, nil
 }
+
 func (s *UserService) AddComment(ctx context.Context, in *commonpb.CommentRequest) (*commonpb.CommentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+	sub_id := getUserIdFromCtx(ctx)
+
+	result, err := s.db.ExecContext(ctx, "INSERT INTO comment (senderID, receiverID, content) VALUES (?, ?, ?)", sub_id, in.TargetId, in.Content)
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	commentId, err := result.LastInsertId()
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	comment := commonpb.Comment{}
+	row := s.db.QueryRowContext(ctx, "SELECT id, senderID, receiverID, content, isHidden FROM comment WHERE id = ?", commentId)
+
+	err = row.Scan(&comment.Id, &comment.CommenterId, &comment.TargetId, &comment.Content, &comment.IsHidden)
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &commonpb.CommentResponse{
+		Comment: &comment,
+	}, nil
 }

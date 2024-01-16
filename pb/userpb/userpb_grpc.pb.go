@@ -29,7 +29,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UploadAvatar(ctx context.Context, in *UpdateAvatarRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
-	ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*BlockResponse, error)
 	// Report User
 	AddComment(ctx context.Context, in *commonpb.CommentRequest, opts ...grpc.CallOption) (*commonpb.CommentResponse, error)
 }
@@ -96,8 +96,8 @@ func (c *userServiceClient) ToggleFollow(ctx context.Context, in *commonpb.GetBy
 	return out, nil
 }
 
-func (c *userServiceClient) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error) {
-	out := new(FollowResponse)
+func (c *userServiceClient) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*BlockResponse, error) {
+	out := new(BlockResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/ToggleBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error)
 	UploadAvatar(context.Context, *UpdateAvatarRequest) (*UserResponse, error)
 	ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
-	ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
+	ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*BlockResponse, error)
 	// Report User
 	AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -152,7 +152,7 @@ func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *UpdateAvata
 func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
 }
-func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
+func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*BlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleBlock not implemented")
 }
 func (UnimplementedUserServiceServer) AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error) {

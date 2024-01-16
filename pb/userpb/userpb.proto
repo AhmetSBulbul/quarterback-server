@@ -11,7 +11,7 @@ service UserService {
     rpc UpdateUser(UserUpdateRequest) returns (UserResponse);
     rpc UploadAvatar(UpdateAvatarRequest) returns (UserResponse); // Remove when file service is ready
     rpc ToggleFollow(common.GetByIdRequest) returns (FollowResponse);
-    rpc ToggleBlock(common.GetByIdRequest) returns (FollowResponse);
+    rpc ToggleBlock(common.GetByIdRequest) returns (BlockResponse);
     // Report User
     rpc AddComment(common.CommentRequest) returns (common.CommentResponse);
     // Hide Comment
@@ -55,13 +55,15 @@ message UserListResponse{
 }
 
 message FollowResponse{
-    User user=1;// It can be user Id
+    reserved 1;
     bool isFollowing=2;
+    int32 subjectUserID=3;
 }
 
 message BlockResponse{
-    User user=1;// It can be user Id
+    reserved 1;
     bool isBlocked=2;
+    int32 subjectUserID=3;
 }
 
 
