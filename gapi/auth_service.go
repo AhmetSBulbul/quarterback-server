@@ -146,7 +146,13 @@ func (a *AuthService) Refresh(ctx context.Context, in *authpb.RefreshTokenReques
 		return nil, gerr(codes.Unauthenticated, nil)
 	}
 
-	accessToken, refreshToken, err := a.genTokens(claims["sub"].(string), int(claims["sub_id"].(float64)))
+	fsub_id, ok := claims["sub_id"].(float64)
+	if !ok {
+		return nil, gerr(codes.InvalidArgument, nil)
+	}
+	sub_id := int(fsub_id)
+
+	accessToken, refreshToken, err := a.genTokens(claims["sub"].(string), sub_id)
 	if err != nil {
 		return nil, gerr(codes.Internal, err)
 	}

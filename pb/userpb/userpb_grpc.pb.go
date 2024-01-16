@@ -27,7 +27,7 @@ type UserServiceClient interface {
 	GetUser(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	SearchUsers(ctx context.Context, in *UserSearchRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	UpdateUser(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserResponse, error)
-	UploadAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*UserResponse, error)
+	UploadAvatar(ctx context.Context, in *UpdateAvatarRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
 	ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
 	// Report User
@@ -78,7 +78,7 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UserUpdateReques
 	return out, nil
 }
 
-func (c *userServiceClient) UploadAvatar(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *userServiceClient) UploadAvatar(ctx context.Context, in *UpdateAvatarRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/UploadAvatar", in, out, opts...)
 	if err != nil {
@@ -122,7 +122,7 @@ type UserServiceServer interface {
 	GetUser(context.Context, *commonpb.GetByIdRequest) (*UserResponse, error)
 	SearchUsers(context.Context, *UserSearchRequest) (*UserListResponse, error)
 	UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error)
-	UploadAvatar(context.Context, *commonpb.File) (*UserResponse, error)
+	UploadAvatar(context.Context, *UpdateAvatarRequest) (*UserResponse, error)
 	ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
 	ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
 	// Report User
@@ -146,7 +146,7 @@ func (UnimplementedUserServiceServer) SearchUsers(context.Context, *UserSearchRe
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *commonpb.File) (*UserResponse, error) {
+func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *UpdateAvatarRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
 }
 func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
@@ -244,7 +244,7 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _UserService_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(commonpb.File)
+	in := new(UpdateAvatarRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func _UserService_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/user.UserService/UploadAvatar",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UploadAvatar(ctx, req.(*commonpb.File))
+		return srv.(UserServiceServer).UploadAvatar(ctx, req.(*UpdateAvatarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

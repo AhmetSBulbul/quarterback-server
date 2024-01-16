@@ -21,6 +21,7 @@ CREATE TABLE district (
 create table file (
 	ID int not null unique auto_increment,
 	path varchar(255) not null,
+	name varchar(255) not null,
 	storageType varchar(50) not null default "local",
 	type varchar(50) not null,
 	primary key (ID)
@@ -29,9 +30,9 @@ create table user (
 	ID int not null unique auto_increment,
 	email varchar(255) not null unique,
 	password varchar(255) not null,
-	districtID int,
-	name varchar(50),
-	lastName varchar(50),
+	districtID int not null,
+	name varchar(50) not null,
+	lastName varchar(50) not null,
 	username varchar(50) not null unique,
 	avatarID int,
 	primary key (ID),
