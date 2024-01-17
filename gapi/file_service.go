@@ -71,9 +71,9 @@ func (s *FileService) Upload(ctx context.Context, in *filepb.UploadRequest) (*fi
 	}
 
 	return &filepb.GetFileResponse{
-		Id:   int32(id),
-		Path: path,
-		Name: name,
+		Id:          int32(id),
+		Path:        path,
+		ContentType: contentType,
 	}, nil
 }
 
