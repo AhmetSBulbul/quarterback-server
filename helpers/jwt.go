@@ -52,7 +52,7 @@ func CreateJWT(claims jwt.MapClaims) (string, error) {
 		return "", err
 	}
 
-	ttl := time.Minute * 15
+	ttl := time.Minute * 120
 	now := time.Now().UTC()
 	allClaims := jwt.MapClaims{
 		"iss": "rnd-auth",
