@@ -28,13 +28,17 @@ type UserServiceClient interface {
 	SearchUsers(ctx context.Context, in *UserSearchRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	UpdateUser(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UploadAvatar(ctx context.Context, in *UpdateAvatarRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	// Follows
 	ToggleFollow(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*FollowResponse, error)
+	GetFollowers(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	GetFollowing(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	// Blocks
 	ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*BlockResponse, error)
-	GetFollowers(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error)
-	GetFollowing(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error)
-	GetBlocked(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error)
-	// Report User
+	GetBlocked(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	// TODO: Report User
+	// Comments
 	AddComment(ctx context.Context, in *commonpb.CommentRequest, opts ...grpc.CallOption) (*commonpb.CommentResponse, error)
+	GetComments(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*commonpb.CommentsResponse, error)
 }
 
 type userServiceClient struct {
@@ -99,6 +103,24 @@ func (c *userServiceClient) ToggleFollow(ctx context.Context, in *commonpb.GetBy
 	return out, nil
 }
 
+func (c *userServiceClient) GetFollowers(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+	out := new(UserListResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetFollowers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetFollowing(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+	out := new(UserListResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetFollowing", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) ToggleBlock(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*BlockResponse, error) {
 	out := new(BlockResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/ToggleBlock", in, out, opts...)
@@ -108,25 +130,7 @@ func (c *userServiceClient) ToggleBlock(ctx context.Context, in *commonpb.GetByI
 	return out, nil
 }
 
-func (c *userServiceClient) GetFollowers(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
-	out := new(UserListResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/GetFollowers", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) GetFollowing(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
-	out := new(UserListResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/GetFollowing", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) GetBlocked(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+func (c *userServiceClient) GetBlocked(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
 	out := new(UserListResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/GetBlocked", in, out, opts...)
 	if err != nil {
@@ -144,6 +148,15 @@ func (c *userServiceClient) AddComment(ctx context.Context, in *commonpb.Comment
 	return out, nil
 }
 
+func (c *userServiceClient) GetComments(ctx context.Context, in *commonpb.GetByIdPaginatedRequest, opts ...grpc.CallOption) (*commonpb.CommentsResponse, error) {
+	out := new(commonpb.CommentsResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetComments", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -153,13 +166,17 @@ type UserServiceServer interface {
 	SearchUsers(context.Context, *UserSearchRequest) (*UserListResponse, error)
 	UpdateUser(context.Context, *UserUpdateRequest) (*UserResponse, error)
 	UploadAvatar(context.Context, *UpdateAvatarRequest) (*UserResponse, error)
+	// Follows
 	ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error)
+	GetFollowers(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error)
+	GetFollowing(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error)
+	// Blocks
 	ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*BlockResponse, error)
-	GetFollowers(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error)
-	GetFollowing(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error)
-	GetBlocked(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error)
-	// Report User
+	GetBlocked(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error)
+	// TODO: Report User
+	// Comments
 	AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error)
+	GetComments(context.Context, *commonpb.GetByIdPaginatedRequest) (*commonpb.CommentsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -185,20 +202,23 @@ func (UnimplementedUserServiceServer) UploadAvatar(context.Context, *UpdateAvata
 func (UnimplementedUserServiceServer) ToggleFollow(context.Context, *commonpb.GetByIdRequest) (*FollowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
 }
+func (UnimplementedUserServiceServer) GetFollowers(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowers not implemented")
+}
+func (UnimplementedUserServiceServer) GetFollowing(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowing not implemented")
+}
 func (UnimplementedUserServiceServer) ToggleBlock(context.Context, *commonpb.GetByIdRequest) (*BlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleBlock not implemented")
 }
-func (UnimplementedUserServiceServer) GetFollowers(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFollowers not implemented")
-}
-func (UnimplementedUserServiceServer) GetFollowing(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFollowing not implemented")
-}
-func (UnimplementedUserServiceServer) GetBlocked(context.Context, *commonpb.GetByIdRequest) (*UserListResponse, error) {
+func (UnimplementedUserServiceServer) GetBlocked(context.Context, *commonpb.GetByIdPaginatedRequest) (*UserListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBlocked not implemented")
 }
 func (UnimplementedUserServiceServer) AddComment(context.Context, *commonpb.CommentRequest) (*commonpb.CommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedUserServiceServer) GetComments(context.Context, *commonpb.GetByIdPaginatedRequest) (*commonpb.CommentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetComments not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -321,6 +341,42 @@ func _UserService_ToggleFollow_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetFollowers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(commonpb.GetByIdPaginatedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetFollowers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetFollowers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetFollowers(ctx, req.(*commonpb.GetByIdPaginatedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetFollowing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(commonpb.GetByIdPaginatedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetFollowing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetFollowing",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetFollowing(ctx, req.(*commonpb.GetByIdPaginatedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_ToggleBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(commonpb.GetByIdRequest)
 	if err := dec(in); err != nil {
@@ -339,44 +395,8 @@ func _UserService_ToggleBlock_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetFollowers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(commonpb.GetByIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).GetFollowers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.UserService/GetFollowers",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetFollowers(ctx, req.(*commonpb.GetByIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_GetFollowing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(commonpb.GetByIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).GetFollowing(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.UserService/GetFollowing",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetFollowing(ctx, req.(*commonpb.GetByIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_GetBlocked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(commonpb.GetByIdRequest)
+	in := new(commonpb.GetByIdPaginatedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -388,7 +408,7 @@ func _UserService_GetBlocked_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/user.UserService/GetBlocked",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetBlocked(ctx, req.(*commonpb.GetByIdRequest))
+		return srv.(UserServiceServer).GetBlocked(ctx, req.(*commonpb.GetByIdPaginatedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -407,6 +427,24 @@ func _UserService_AddComment_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).AddComment(ctx, req.(*commonpb.CommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetComments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(commonpb.GetByIdPaginatedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetComments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetComments",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetComments(ctx, req.(*commonpb.GetByIdPaginatedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -443,10 +481,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_ToggleFollow_Handler,
 		},
 		{
-			MethodName: "ToggleBlock",
-			Handler:    _UserService_ToggleBlock_Handler,
-		},
-		{
 			MethodName: "GetFollowers",
 			Handler:    _UserService_GetFollowers_Handler,
 		},
@@ -455,12 +489,20 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetFollowing_Handler,
 		},
 		{
+			MethodName: "ToggleBlock",
+			Handler:    _UserService_ToggleBlock_Handler,
+		},
+		{
 			MethodName: "GetBlocked",
 			Handler:    _UserService_GetBlocked_Handler,
 		},
 		{
 			MethodName: "AddComment",
 			Handler:    _UserService_AddComment_Handler,
+		},
+		{
+			MethodName: "GetComments",
+			Handler:    _UserService_GetComments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

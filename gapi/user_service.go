@@ -3,6 +3,7 @@ package gapi
 import (
 	"context"
 	"database/sql"
+	"math"
 
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
@@ -37,26 +38,44 @@ func (s *UserService) getUserByID(ctx context.Context, userid int) (*userpb.User
 	return &user, nil
 }
 
-func (s *UserService) getUserBySearch(ctx context.Context, query string) ([]*userpb.User, error) {
-	rows, err := s.db.QueryContext(ctx, "SELECT id, email, districtID, name, lastName, username, avatarID FROM user WHERE username LIKE %?% OR name LIKE %?% OR lastName LIKE %?%", query, query, query)
+func (s *UserService) getUsersBySearch(ctx context.Context, value string, cursor int, limit int) ([]*userpb.User, int, error) {
+	query := `SELECT 
+		u.id,
+		u.email,
+		u.districtID,
+		u.name,
+		u.lastName,
+		u.username,
+		u.avatarID,
+		COUNT(*) OVER() AS total
+	FROM user u
+	WHERE 
+		u.id > ? AND
+		u.username LIKE '%?%' OR
+		u.name LIKE '%?%' OR
+		u.lastName LIKE '%?%'
+	ORDER BY u.id ASC
+	LIMIT ?`
+
+	rows, err := s.db.QueryContext(ctx, query, cursor, value, value, value, limit)
 	if err != nil {
-		return nil, gerr(codes.Internal, err)
+		return nil, 0, gerr(codes.Internal, err)
 	}
 	defer rows.Close()
-
+	var total int
 	var users []*userpb.User
 	for rows.Next() {
 		var user userpb.User
 		var avatarID sql.NullString
-		err := rows.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarID)
+		err := rows.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarID, &total)
 		if err != nil {
-			return nil, gerr(codes.Internal, err)
+			return nil, 0, gerr(codes.Internal, err)
 		}
 		user.AvatarPath = avatarID.String
 		users = append(users, &user)
 	}
 
-	return users, nil
+	return users, total, nil
 }
 
 func (s *UserService) GetMe(ctx context.Context, in *commonpb.Empty) (*userpb.UserResponse, error) {
@@ -83,19 +102,30 @@ func (s *UserService) GetUser(ctx context.Context, in *commonpb.GetByIdRequest) 
 }
 
 func (s *UserService) SearchUsers(ctx context.Context, in *userpb.UserSearchRequest) (*userpb.UserListResponse, error) {
+	cursor := in.Pagination.GetCursorId()
+	limit := int(math.Min(float64(in.Pagination.GetLimit()), 200))
+
 	if in.Query.String() != "" {
-		users, err := s.getUserBySearch(ctx, in.Query.String())
+		users, total, err := s.getUsersBySearch(ctx, in.Query.String(), int(cursor), limit)
 		if err != nil {
 			return nil, err
 		}
 		return &userpb.UserListResponse{
 			User: users,
+			Pagination: &commonpb.PaginationResponse{
+				CursorId: users[len(users)-1].Id,
+				Total:    int32(total),
+			},
 		}, nil
 	}
 	// TODO: implement query by district
 	var users []*userpb.User
 	return &userpb.UserListResponse{
 		User: users,
+		Pagination: &commonpb.PaginationResponse{
+			CursorId: 0,
+			Total:    0,
+		},
 	}, nil
 }
 
