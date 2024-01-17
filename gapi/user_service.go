@@ -39,6 +39,7 @@ func (s *UserService) getUserByID(ctx context.Context, userid int) (*userpb.User
 }
 
 func (s *UserService) getUsersBySearch(ctx context.Context, value string, cursor int, limit int) ([]*userpb.User, int, error) {
+	sub_id := getUserIdFromCtx(ctx)
 	query := `SELECT 
 		u.id,
 		u.email,
@@ -51,19 +52,36 @@ func (s *UserService) getUsersBySearch(ctx context.Context, value string, cursor
 	FROM user u
 	WHERE 
 		u.id > ? AND
-		u.username LIKE '%?%' OR
-		u.name LIKE '%?%' OR
-		u.lastName LIKE '%?%'
+		u.id != ? AND
+		(u.username LIKE ? OR
+		u.name LIKE ? OR
+		u.lastName LIKE ?)
 	ORDER BY u.id ASC
 	LIMIT ?`
 
-	rows, err := s.db.QueryContext(ctx, query, cursor, value, value, value, limit)
+	_like := "%%"
+
+	if value != "" {
+		_like = "%" + value + "%"
+	}
+
+	rows, err := s.db.QueryContext(
+		ctx,
+		query,
+		cursor,
+		sub_id,
+		_like,
+		_like,
+		_like,
+		limit,
+	)
 	if err != nil {
 		return nil, 0, gerr(codes.Internal, err)
 	}
 	defer rows.Close()
 	var total int
 	var users []*userpb.User
+
 	for rows.Next() {
 		var user userpb.User
 		var avatarID sql.NullString
@@ -105,28 +123,34 @@ func (s *UserService) SearchUsers(ctx context.Context, in *userpb.UserSearchRequ
 	cursor := in.Pagination.GetCursorId()
 	limit := int(math.Min(float64(in.Pagination.GetLimit()), 200))
 
-	if in.Query.String() != "" {
-		users, total, err := s.getUsersBySearch(ctx, in.Query.String(), int(cursor), limit)
-		if err != nil {
-			return nil, err
-		}
-		return &userpb.UserListResponse{
-			User: users,
-			Pagination: &commonpb.PaginationResponse{
-				CursorId: users[len(users)-1].Id,
-				Total:    int32(total),
-			},
-		}, nil
+	if limit == 0 {
+		limit = 10
 	}
-	// TODO: implement query by district
-	var users []*userpb.User
+
+	users, total, err := s.getUsersBySearch(ctx, in.Query.GetQuery(), int(cursor), limit)
+	if err != nil {
+		return nil, err
+	}
+	var cursorId int32 = 0
+	if len(users) > 0 {
+		cursorId = users[len(users)-1].Id
+	}
 	return &userpb.UserListResponse{
 		User: users,
 		Pagination: &commonpb.PaginationResponse{
-			CursorId: 0,
-			Total:    0,
+			CursorId: cursorId,
+			Total:    int32(total),
 		},
 	}, nil
+	// TODO: implement query by district
+	// var users []*userpb.User
+	// return &userpb.UserListResponse{
+	// 	User: users,
+	// 	Pagination: &commonpb.PaginationResponse{
+	// 		CursorId: 0,
+	// 		Total:    0,
+	// 	},
+	// }, nil
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, in *userpb.UserUpdateRequest) (*userpb.UserResponse, error) {

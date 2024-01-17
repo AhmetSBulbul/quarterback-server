@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -12,6 +13,7 @@ import (
 )
 
 var keys = make(map[string][]byte, 2)
+var lock = sync.RWMutex{}
 
 func readKeyFromFile(path string) []byte {
 	if keys[path] != nil {
@@ -22,7 +24,9 @@ func readKeyFromFile(path string) []byte {
 			fmt.Errorf(err.Error())
 			return []byte{}
 		}
+		lock.Lock()
 		keys[path] = f
+		lock.Unlock()
 		return f
 	}
 }
