@@ -99,3 +99,37 @@ func (r *RegionService) ListDistrict(ctx context.Context, in *commonpb.GetByIdRe
 		Districts: districts,
 	}, nil
 }
+
+func (r *RegionService) GetRegionByDistrictId(ctx context.Context, in *commonpb.GetByIdRequest) (*regionpb.Region, error) {
+	var country regionpb.Country
+	var city regionpb.City
+	var district regionpb.District
+
+	query := `SELECT
+		co.id,
+		co.name,
+		c.id,
+		c.name,
+		c.countryID,
+		d.id,
+		d.name,
+		d.cityID
+		FROM district d
+		INNER JOIN city c ON c.id = d.cityID
+		INNER JOIN country co ON co.id = c.countryID
+		WHERE d.id = ?`
+	row := r.db.QueryRowContext(ctx, query, in.Id)
+
+	err := row.Scan(&country.Id, &country.Name, &city.Id, &city.Name, &city.CountryId, &district.Id, &district.Name, &district.CityId)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	var region regionpb.Region
+
+	region.Country = &country
+	region.City = &city
+	region.District = &district
+
+	return &region, nil
+}
