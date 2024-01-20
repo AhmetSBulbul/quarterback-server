@@ -25,7 +25,7 @@ func (s *UserService) getUserByID(ctx context.Context, userid int) (*userpb.User
 	var user userpb.User
 	var avatarID sql.NullString
 
-	query := "SELECT id, email, districtID, name, lastName, username, avatarID FROM user WHERE id = ?"
+	query := "SELECT u.id, u.email, u.districtID, u.name, u.lastName, u.username, f.path FROM user as u LEFT JOIN file f ON f.id = u.avatarID WHERE u.id = ?"
 	row := s.db.QueryRowContext(ctx, query, userid)
 	err := row.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarID)
 
@@ -47,9 +47,10 @@ func (s *UserService) getUsersBySearch(ctx context.Context, value string, cursor
 		u.name,
 		u.lastName,
 		u.username,
-		u.avatarID,
+		f.path,
 		COUNT(*) OVER() AS total
 	FROM user u
+	LEFT JOIN file f ON f.id = u.avatarID
 	WHERE 
 		u.id > ? AND
 		u.id != ? AND
