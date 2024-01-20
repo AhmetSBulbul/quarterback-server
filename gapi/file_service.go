@@ -82,7 +82,7 @@ func (s *FileService) Upload(ctx context.Context, in *filepb.UploadRequest) (*fi
 }
 
 func (s *FileService) GetFile(ctx context.Context, in *filepb.FileId) (*filepb.GetFileResponse, error) {
-	row := s.db.QueryRowContext(ctx, "SELECT (id, path, type) FROM file WHERE id = ?", in.Id)
+	row := s.db.QueryRowContext(ctx, "SELECT id, path, type FROM file WHERE id = ?", in.Id)
 
 	var file filepb.GetFileResponse
 
