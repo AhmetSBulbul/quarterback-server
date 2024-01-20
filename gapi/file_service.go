@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mime"
 	"os"
+	"regexp"
 
 	"github.com/AhmetSBulbul/quarterback-server/pb/filepb"
 	"github.com/google/uuid"
@@ -22,11 +23,11 @@ type FileService struct {
 }
 
 // TODO: Add object storage
-func write(data []byte, name string) (string, error) {
+func write(data []byte, extension string) (string, error) {
 	_guid, _ := uuid.NewUUID()
 	guid := _guid.String()
-	extension := name[len(name)-4:]
-	path := fmt.Sprintf("%s/%s.%s", publicDir, guid, extension)
+
+	path := fmt.Sprintf("%s/%s%s", publicDir, guid, extension)
 	err := os.WriteFile(path, data, 0644)
 
 	if err != nil {
@@ -37,7 +38,7 @@ func write(data []byte, name string) (string, error) {
 }
 
 func (s *FileService) saveFile(ctx context.Context, path string, name string, contentType string) (int, error) {
-	query := "INSERT INTO file (path, name, type) VALUES (?, ?);"
+	query := "INSERT INTO file (path, name, type) VALUES (?, ?, ?);"
 	result, err := s.db.Exec(query, path, name, contentType)
 	if err != nil {
 		return 0, err
@@ -52,12 +53,15 @@ func (s *FileService) saveFile(ctx context.Context, path string, name string, co
 }
 
 func (s *FileService) Upload(ctx context.Context, in *filepb.UploadRequest) (*filepb.GetFileResponse, error) {
+	var publicHost = os.Getenv("PUBLIC_HOST")
 	data := in.GetData()
 	name := in.GetName()
 
-	contentType := mime.TypeByExtension(name[len(name)-4:])
+	regexp.MustCompile(`\s+`).ReplaceAllString(name, "_")
+	extension := regexp.MustCompile(`\.[a-zA-Z0-9]+$`).FindString(name)
+	contentType := mime.TypeByExtension(extension)
 
-	path, err := write(data, name)
+	path, err := write(data, extension)
 
 	if err != nil {
 		return nil, gerr(codes.Internal, err)
@@ -72,7 +76,7 @@ func (s *FileService) Upload(ctx context.Context, in *filepb.UploadRequest) (*fi
 
 	return &filepb.GetFileResponse{
 		Id:          int32(id),
-		Path:        path,
+		Path:        publicHost + "/" + path,
 		ContentType: contentType,
 	}, nil
 }

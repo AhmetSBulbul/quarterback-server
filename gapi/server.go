@@ -12,6 +12,7 @@ import (
 
 	"github.com/AhmetSBulbul/quarterback-server/helpers"
 	"github.com/AhmetSBulbul/quarterback-server/pb/authpb"
+	"github.com/AhmetSBulbul/quarterback-server/pb/filepb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/regionpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"github.com/go-playground/validator/v10"
@@ -98,6 +99,7 @@ func NewServer(db *sql.DB) {
 	authpb.RegisterAuthServiceServer(s, &AuthService{db: db, validate: validate})
 	regionpb.RegisterRegionServiceServer(s, &RegionService{db: db})
 	userpb.RegisterUserServiceServer(s, &UserService{db: db, validate: validate})
+	filepb.RegisterFileServiceServer(s, &FileService{db: db})
 
 	lis, err := net.Listen("tcp", os.Getenv("LISTEN_ADDR"))
 	if err != nil {
