@@ -11,6 +11,7 @@ services:
     - .env
   ports:
     - "50001:50001"
+    - "8080:8080"
   depends_on:
     - mariadb01
   # TODO: Fetch from locally mounted env file (remove redundancy)
