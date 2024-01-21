@@ -39,6 +39,7 @@ func (s *UserService) getUserByID(ctx context.Context, userid int) (*userpb.User
 }
 
 func (s *UserService) getUsersBySearch(ctx context.Context, value string, cursor int, limit int) ([]*userpb.User, int, error) {
+	// TODO: Filter blocked users?
 	sub_id := getUserIdFromCtx(ctx)
 	query := `SELECT 
 		u.id,
@@ -311,4 +312,97 @@ func (s *UserService) AddComment(ctx context.Context, in *commonpb.CommentReques
 	return &commonpb.CommentResponse{
 		Comment: &comment,
 	}, nil
+}
+
+func (s *UserService) GetFollowers(ctx context.Context, in *commonpb.GetByIdPaginatedRequest) (*userpb.UserListResponse, error) {
+	// Only pussies uses pagination
+	// isFollower and isFollowing will be checked on client side. So due of that we don't use pagination here.
+	// Maybe later
+	query := `SELECT
+		u.id,
+		u.email,
+		u.districtId,
+		u.name,
+		u.lastName,
+		u.username,
+		f.path
+	FROM follower fol
+	INNER JOIN user u ON u.id = fol.followerID
+	LEFT JOIN file f ON f.id = u.avatarID
+	WHERE fol.followingID = ?`
+
+	rows, err := s.db.QueryContext(ctx, query, in.Id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	defer rows.Close()
+
+	var users []*userpb.User
+
+	for rows.Next() {
+		var user userpb.User
+		var avatarPath sql.NullString
+		err := rows.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarPath)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		user.AvatarPath = avatarPath.String
+		users = append(users, &user)
+	}
+
+	return &userpb.UserListResponse{
+		User:       users,
+		Pagination: &commonpb.PaginationResponse{},
+	}, nil
+
+}
+
+func (s *UserService) GetFollowing(ctx context.Context, in *commonpb.GetByIdPaginatedRequest) (*userpb.UserListResponse, error) {
+	// Copy - Paste from follower
+	query := `SELECT
+		u.id,
+		u.email,
+		u.districtId,
+		u.name,
+		u.lastName,
+		u.username,
+		f.path
+	FROM follower fol
+	INNER JOIN user u ON u.id = fol.followingID
+	LEFT JOIN file f ON f.id = u.avatarID
+	WHERE fol.followerID = ?`
+
+	rows, err := s.db.QueryContext(ctx, query, in.Id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	defer rows.Close()
+
+	var users []*userpb.User
+
+	for rows.Next() {
+		var user userpb.User
+		var avatarPath sql.NullString
+		err := rows.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarPath)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		user.AvatarPath = avatarPath.String
+		users = append(users, &user)
+	}
+
+	return &userpb.UserListResponse{
+		User:       users,
+		Pagination: &commonpb.PaginationResponse{},
+	}, nil
+}
+
+func (s *UserService) GetBlocked(_ context.Context, _ *commonpb.GetByIdPaginatedRequest) (*userpb.UserListResponse, error) {
+	return nil, gerr(codes.Unimplemented, nil) // TODO: Implement
+}
+
+func (s *UserService) GetComments(_ context.Context, _ *commonpb.GetByIdPaginatedRequest) (*commonpb.CommentsResponse, error) {
+	return nil, gerr(codes.Unimplemented, nil) // TODO: Implement
 }
