@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/courtpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,7 +32,44 @@ func (s *CourtService) ListCourtByLocation(ctx context.Context, in *courtpb.List
 }
 
 func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtRequest) (*courtpb.ListCourtResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchCourt not implemented")
+	sub_id := getUserIdFromCtx(ctx)
+	query := `SELECT
+		c.ID,
+		c.name,
+		c.districtID,
+		c.coordinate,
+		c.address
+	FROM court c
+	INNER JOIN user u ON u.id = ?
+	WHERE
+		u.districtID = c.districtID`
+
+	rows, err := s.db.QueryContext(
+		ctx, query, sub_id,
+	)
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	defer rows.Close()
+
+	var courts []*courtpb.Court
+
+	for rows.Next() {
+		var court courtpb.Court
+		err := rows.Scan(&court.Id, &court.Name, &court.DistrictId, &court.Location, &court.Address)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		court.Media = make([]*commonpb.Media, 0)
+		courts = append(courts, &court)
+	}
+
+	return &courtpb.ListCourtResponse{
+		Courts:     courts,
+		Pagination: &commonpb.PaginationResponse{},
+	}, nil
 }
 
 func (s *CourtService) CreateCourt(ctx context.Context, in *courtpb.Court) (*courtpb.CourtResponse, error) {
