@@ -44,3 +44,23 @@ Run API binary
     cp .env.example .env
     go run main.go
 ```
+
+## To-Do
+
+- [ ] Court Create and Get
+- [ ] Courts Seed min 5-6 for main districts (Bornova, Karsiyaka). 1-2 is enough for others
+- [ ] Get Courts by location to show on home page and start game screen
+- [ ] Comment on courts
+- [ ] If possible court check-in(pazarlarken is yapar redis varsa ttl'li falan deneriz sunumluk olacak)
+- [ ] Create Game
+- [ ] Start Game
+- [ ] End Game
+- [ ] Cancel Game
+- [ ] Comment to game
+- [ ] Scores and points
+
+### Good to have
+- [ ] Simple chat just for presentation don't need to be fully functional we can store the data on mongo, redis or sql doesn't matter.
+
+- [ ] Create Team
+- [ ] Team Match
