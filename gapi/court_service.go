@@ -15,7 +15,7 @@ type CourtService struct {
 }
 
 func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest) (*courtpb.CourtResponse, error) {
-	query := "SELECT ID, name, districtID, coordinate, address FROM courts WHERE id = ?"
+	query := "SELECT ID, name, districtID, coordinate, address FROM court WHERE id = ?"
 	court := &courtpb.Court{}
 
 	err := s.db.QueryRowContext(ctx, query, in.GetId()).Scan(&court.Id, &court.Name, &court.DistrictId, &court.Location, &court.Address)
@@ -35,7 +35,7 @@ func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtR
 }
 
 func (s *CourtService) CreateCourt(ctx context.Context, in *courtpb.Court) (*courtpb.CourtResponse, error) {
-	query := "INSERT INTO courts (name, districtID, coordinate, address) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO court (name, districtID, coordinate, address) VALUES (?, ?, ?, ?)"
 
 	res, err := s.db.ExecContext(ctx, query, in.Name, in.DistrictId, in.Location, in.Address)
 	if err != nil {
