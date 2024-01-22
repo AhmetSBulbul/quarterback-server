@@ -51,6 +51,7 @@ Run API binary
 - [ ] Courts Seed min 5-6 for main districts (Bornova, Karsiyaka). 1-2 is enough for others
 - [ ] Get Courts by location to show on home page and start game screen
 - [ ] Comment on courts
+- [ ] Add media for court 
 - [ ] If possible court check-in(pazarlarken is yapar redis varsa ttl'li falan deneriz sunumluk olacak)
 - [ ] Create Game
 - [ ] Start Game
