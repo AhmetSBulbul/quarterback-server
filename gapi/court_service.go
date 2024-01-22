@@ -33,11 +33,11 @@ func (s *CourtService) ListCourtByLocation(ctx context.Context, in *courtpb.List
 
 func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtRequest) (*courtpb.ListCourtResponse, error) {
 	sub_id := getUserIdFromCtx(ctx)
+	// TODO: coordinate serialization'i ekler misin buraya
 	query := `SELECT
 		c.ID,
 		c.name,
 		c.districtID,
-		c.coordinate,
 		c.address
 	FROM court c
 	INNER JOIN user u ON u.id = ?
@@ -58,7 +58,7 @@ func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtR
 
 	for rows.Next() {
 		var court courtpb.Court
-		err := rows.Scan(&court.Id, &court.Name, &court.DistrictId, &court.Location, &court.Address)
+		err := rows.Scan(&court.Id, &court.Name, &court.DistrictId, &court.Address)
 		if err != nil {
 			return nil, gerr(codes.Internal, err)
 		}
