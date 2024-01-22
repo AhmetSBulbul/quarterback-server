@@ -5,13 +5,14 @@ services:
     context: .
   restart: unless-stopped
   ports:
+    - "50001:50001"
     - "8080:8080"
   depends_on:
     - database
   volumes:
     - ./public:/app/public
   environment:
-    LISTEN_ADDR: ":8080"
+    LISTEN_ADDR: ":50001"
     DB_CONNECTION: "qbsql:152535@tcp(database:3306)/qbsql?parseTime=true"
  database:
     build:
