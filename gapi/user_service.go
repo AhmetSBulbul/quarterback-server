@@ -7,14 +7,12 @@ import (
 
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
-	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
 )
 
 type UserService struct {
 	db *sql.DB
 	userpb.UnimplementedUserServiceServer
-	validate *validator.Validate
 }
 
 func getUserIdFromCtx(ctx context.Context) int {
