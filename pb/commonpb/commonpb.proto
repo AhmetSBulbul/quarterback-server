@@ -48,10 +48,6 @@ message SuccessResponse {
     string message = 1;
 }
 
-message BoolResponse {
-    bool value = 1;
-}
-
 message Empty{}
 
 message File {
