@@ -8,6 +8,7 @@ package courtpb
 
 import (
 	context "context"
+	commonpb "github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -26,6 +27,9 @@ type CourtServiceClient interface {
 	ListCourtByLocation(ctx context.Context, in *ListCourtByLocationRequest, opts ...grpc.CallOption) (*ListCourtResponse, error)
 	SearchCourt(ctx context.Context, in *SearchCourtRequest, opts ...grpc.CallOption) (*ListCourtResponse, error)
 	CreateCourt(ctx context.Context, in *Court, opts ...grpc.CallOption) (*CourtResponse, error)
+	CheckInCourt(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*CheckInCourtResponse, error)
+	AddComment(ctx context.Context, in *CourtCommentRequest, opts ...grpc.CallOption) (*CourtComment, error)
+	ListComment(ctx context.Context, in *CourtCommentListRequest, opts ...grpc.CallOption) (*CourtCommentListResponse, error)
 }
 
 type courtServiceClient struct {
@@ -72,6 +76,33 @@ func (c *courtServiceClient) CreateCourt(ctx context.Context, in *Court, opts ..
 	return out, nil
 }
 
+func (c *courtServiceClient) CheckInCourt(ctx context.Context, in *commonpb.GetByIdRequest, opts ...grpc.CallOption) (*CheckInCourtResponse, error) {
+	out := new(CheckInCourtResponse)
+	err := c.cc.Invoke(ctx, "/court.CourtService/CheckInCourt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courtServiceClient) AddComment(ctx context.Context, in *CourtCommentRequest, opts ...grpc.CallOption) (*CourtComment, error) {
+	out := new(CourtComment)
+	err := c.cc.Invoke(ctx, "/court.CourtService/AddComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courtServiceClient) ListComment(ctx context.Context, in *CourtCommentListRequest, opts ...grpc.CallOption) (*CourtCommentListResponse, error) {
+	out := new(CourtCommentListResponse)
+	err := c.cc.Invoke(ctx, "/court.CourtService/ListComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CourtServiceServer is the server API for CourtService service.
 // All implementations must embed UnimplementedCourtServiceServer
 // for forward compatibility
@@ -80,6 +111,9 @@ type CourtServiceServer interface {
 	ListCourtByLocation(context.Context, *ListCourtByLocationRequest) (*ListCourtResponse, error)
 	SearchCourt(context.Context, *SearchCourtRequest) (*ListCourtResponse, error)
 	CreateCourt(context.Context, *Court) (*CourtResponse, error)
+	CheckInCourt(context.Context, *commonpb.GetByIdRequest) (*CheckInCourtResponse, error)
+	AddComment(context.Context, *CourtCommentRequest) (*CourtComment, error)
+	ListComment(context.Context, *CourtCommentListRequest) (*CourtCommentListResponse, error)
 	mustEmbedUnimplementedCourtServiceServer()
 }
 
@@ -98,6 +132,15 @@ func (UnimplementedCourtServiceServer) SearchCourt(context.Context, *SearchCourt
 }
 func (UnimplementedCourtServiceServer) CreateCourt(context.Context, *Court) (*CourtResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCourt not implemented")
+}
+func (UnimplementedCourtServiceServer) CheckInCourt(context.Context, *commonpb.GetByIdRequest) (*CheckInCourtResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckInCourt not implemented")
+}
+func (UnimplementedCourtServiceServer) AddComment(context.Context, *CourtCommentRequest) (*CourtComment, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedCourtServiceServer) ListComment(context.Context, *CourtCommentListRequest) (*CourtCommentListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListComment not implemented")
 }
 func (UnimplementedCourtServiceServer) mustEmbedUnimplementedCourtServiceServer() {}
 
@@ -184,6 +227,60 @@ func _CourtService_CreateCourt_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CourtService_CheckInCourt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(commonpb.GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourtServiceServer).CheckInCourt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/court.CourtService/CheckInCourt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourtServiceServer).CheckInCourt(ctx, req.(*commonpb.GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CourtService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CourtCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourtServiceServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/court.CourtService/AddComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourtServiceServer).AddComment(ctx, req.(*CourtCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CourtService_ListComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CourtCommentListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourtServiceServer).ListComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/court.CourtService/ListComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourtServiceServer).ListComment(ctx, req.(*CourtCommentListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CourtService_ServiceDesc is the grpc.ServiceDesc for CourtService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +303,18 @@ var CourtService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCourt",
 			Handler:    _CourtService_CreateCourt_Handler,
+		},
+		{
+			MethodName: "CheckInCourt",
+			Handler:    _CourtService_CheckInCourt_Handler,
+		},
+		{
+			MethodName: "AddComment",
+			Handler:    _CourtService_AddComment_Handler,
+		},
+		{
+			MethodName: "ListComment",
+			Handler:    _CourtService_ListComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -158,3 +158,21 @@ create table chat (
 	constraint `cr_chat_sender_fk` foreign key (senderID) references user(ID) on delete cascade,
 	constraint `cr_chat_receiver_fk` foreign key (receiverID) references user(ID) on delete cascade
 );
+create table checkin (
+	ID int not null unique auto_increment,
+	userID int,
+	courtID int,
+	createdAt datetime default current_timestamp,
+	primary key (ID),
+	constraint `cr_checkin_user_fk` foreign key (userID) references user(ID) on delete cascade,
+	constraint `cr_checkin_court_fk` foreign key (courtID) references court(ID) on delete cascade
+);
+create table court_comment (
+	ID int not null unique auto_increment,
+	senderID int,
+	courtID int,
+	content text,
+	primary key (ID),
+	constraint `cr_court_comment_sender_fk` foreign key (senderID) references user(ID) on delete cascade,
+	constraint `cr_court_comment_court_fk` foreign key (courtID) references court(ID) on delete cascade
+);
