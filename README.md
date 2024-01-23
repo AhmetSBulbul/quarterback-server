@@ -47,7 +47,7 @@ Run API binary
 
 ## To-Do
 
-- [ ] Court Create and Get
+- [x] Court Create and Get
 - [x] Courts Seed min 5-6 for main districts (Bornova, Karsiyaka). 1-2 is enough for others
 - [ ] Get Courts by location to show on home page and start game screen
 - [ ] Comment on courts
@@ -61,7 +61,7 @@ Run API binary
 - [ ] Scores and points
 
 ### Good to have
-- [ ] Simple chat just for presentation don't need to be fully functional we can store the data on mongo, redis or sql doesn't matter.
+- [x] Simple chat just for presentation don't need to be fully functional we can store the data on mongo, redis or sql doesn't matter.
 
 - [ ] Create Team
 - [ ] Team Match
