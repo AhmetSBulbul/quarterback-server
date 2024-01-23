@@ -148,3 +148,13 @@ create table block (
 	constraint `cr_block_blocker_fk` foreign key (blockerID) references user(ID) on delete cascade,
 	constraint `cr_block_blocked_fk` foreign key (blockedID) references user(ID) on delete cascade
 );
+create table chat (
+	ID int not null unique auto_increment,
+	senderID int,
+	receiverID int,
+	content text,
+	isReceived bool default 0,
+	primary key (ID),
+	constraint `cr_chat_sender_fk` foreign key (senderID) references user(ID) on delete cascade,
+	constraint `cr_chat_receiver_fk` foreign key (receiverID) references user(ID) on delete cascade
+);
