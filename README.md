@@ -48,17 +48,19 @@ Run API binary
 ## To-Do
 
 - [x] Court Create and Get
-- [x] Courts Seed min 5-6 for main districts (Bornova, Karsiyaka). 1-2 is enough for others
-- [ ] Get Courts by location to show on home page and start game screen
-- [ ] Comment on courts
-- [ ] Add media for court 
-- [ ] If possible court check-in(pazarlarken is yapar redis varsa ttl'li falan deneriz sunumluk olacak)
-- [ ] Create Game
-- [ ] Start Game
-- [ ] End Game
-- [ ] Cancel Game
-- [ ] Comment to game
-- [ ] Scores and points
+- [x] Courts Seed min 5-6 for main districts (Bornova, Karsiyaka). 1-2 is enough for others,
+- [x] Comment on courts
+- [?] Add media for court (@AhmetSBulbul)
+- [ ] Comment to game(@AhmetSBulbul)
+- [x] If possible court check-in(pazarlarken is yapar redis varsa ttl'li falan deneriz sunumluk olacak)
+- [ ] Get Courts by location to show on home page and start game screen(@okb)
+- [ ] Create Game (@okb)
+- [ ] Start Game (@okb)
+- [ ] End Game (@okb)
+- [ ] Cancel Game (@okb)
+- [ ] Scores and points (@okb)
+
+Not: docker compose dev dosyasinda calisiyorsan production dosyasini da guncellemeyi unuttma config degisikliginde.
 
 ### Good to have
 - [x] Simple chat just for presentation don't need to be fully functional we can store the data on mongo, redis or sql doesn't matter.
