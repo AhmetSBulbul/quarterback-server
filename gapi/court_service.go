@@ -7,6 +7,7 @@ import (
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/courtpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/regionpb"
+	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,7 +17,26 @@ type CourtService struct {
 	courtpb.UnimplementedCourtServiceServer
 }
 
+// Repository olusturmaya usendim .s
+func (s *CourtService) getUserByID(ctx context.Context, userid int) (*userpb.User, error) {
+	var user userpb.User
+	var avatarID sql.NullString
+
+	query := "SELECT u.id, u.email, u.districtID, u.name, u.lastName, u.username, f.path FROM user as u LEFT JOIN file f ON f.id = u.avatarID WHERE u.id = ?"
+	row := s.db.QueryRowContext(ctx, query, userid)
+	err := row.Scan(&user.Id, &user.Email, &user.DistrictID, &user.Name, &user.Lastname, &user.Username, &avatarID)
+
+	user.AvatarPath = avatarID.String
+
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &user, nil
+}
+
 func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest) (*courtpb.CourtResponse, error) {
+	// TODO: get checkins
 	query := `SELECT
 		c.ID,
 		c.name,
@@ -33,6 +53,7 @@ func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest
 	WHERE
 		c.districtId = ?
 	GROUP BY c.id;`
+	// TODO: no need to group by!
 	court := &courtpb.Court{}
 	district := &regionpb.District{}
 
@@ -67,7 +88,7 @@ func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtR
 	INNER JOIN district d ON c.districtID = d.ID
 	INNER JOIN user u ON u.id = ?
 	LEFT JOIN court_comment com on com.courtID = c.ID
-	LEFT JOIN checkin on checkin.courtID = c.ID
+	LEFT JOIN checkin on checkin.courtID = c.ID AND checkin.createdAt > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 20 MINUTE)
 	WHERE
 		u.districtID = c.districtID
 	GROUP BY c.id;`
@@ -120,7 +141,92 @@ func (s *CourtService) CreateCourt(ctx context.Context, in *courtpb.Court) (*cou
 }
 
 func (s *CourtService) CheckInCourt(ctx context.Context, in *commonpb.GetByIdRequest) (*courtpb.CheckInCourtResponse, error) {
-	panic("not implemented") // TODO: Implement
+	// TODO: check if sender has any other checkin in last 30 min
+	sub_id := getUserIdFromCtx(ctx)
+	query := "INSERT INTO checkin (userID, courtID) VALUES (?, ?)"
+
+	result, err := s.db.ExecContext(ctx, query, sub_id, in.Id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	checkInId, err := result.LastInsertId()
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &courtpb.CheckInCourtResponse{
+		Id:        int32(checkInId),
+		CheckedIn: true,
+	}, nil
+}
+
+func (s *CourtService) AddComment(ctx context.Context, req *courtpb.CourtCommentRequest) (*courtpb.CourtComment, error) {
+	sub_id := getUserIdFromCtx(ctx)
+
+	query := "INSERT INTO court_comment (senderID, courtID, content) VALUES (?, ?, ?)"
+	result, err := s.db.ExecContext(ctx, query, sub_id, req.CourtId, req.Content)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	commentId, err := result.LastInsertId()
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	sender, err := s.getUserByID(ctx, sub_id)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	var comment courtpb.CourtComment
+
+	query = "SELECT com.id, com.courtID, com.content FROM court_comment as com WHERE com.ID = ?"
+	row := s.db.QueryRowContext(ctx, query, commentId)
+
+	err = row.Scan(&comment.Id, &comment.CourtId, &comment.Content)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	comment.Sender = sender
+
+	return &comment, nil
+
+}
+
+func (s *CourtService) ListComment(ctx context.Context, in *courtpb.CourtCommentListRequest) (*courtpb.CourtCommentListResponse, error) {
+	query := "SELECT com.id, com.courtID, com.senderID, com.content FROM court_comment as com WHERE com.courtID = ?"
+	rows, err := s.db.QueryContext(ctx, query, in.CourtId)
+	if err != nil {
+		return nil, gerr(codes.Internal, err)
+	}
+
+	defer rows.Close()
+
+	var comments []*courtpb.CourtComment
+
+	for rows.Next() {
+		var senderId int
+		var comment courtpb.CourtComment
+
+		err := rows.Scan(&comment.Id, &comment.CourtId, &senderId, &comment.Content)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+
+		sender, err := s.getUserByID(ctx, senderId)
+		if err != nil {
+			return nil, gerr(codes.Internal, err)
+		}
+		comment.Sender = sender
+		comments = append(comments, &comment)
+	}
+	return &courtpb.CourtCommentListResponse{
+		Comments:   comments,
+		Pagination: &commonpb.PaginationResponse{},
+	}, nil
 }
 
 func (s *CourtService) mustEmbedUnimplementedCourtServiceServer() {

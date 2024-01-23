@@ -65,3 +65,8 @@ Run API binary
 
 - [ ] Create Team
 - [ ] Team Match
+
+
+## MUST HAVE IF WE HAVE PLAN TO MAINTAIN IT
+
+- [ ] Allah rizasi icin katmanlama join atmaktan bileklerim kireclendi.
