@@ -18,6 +18,7 @@ services:
     build:
      context: ./database
     restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports: 
       - "33061:3306"
     environment:

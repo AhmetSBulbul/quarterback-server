@@ -3,6 +3,7 @@ package gapi
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/AhmetSBulbul/quarterback-server/pb/commonpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/courtpb"
@@ -68,15 +69,60 @@ func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest
 	return &courtpb.CourtResponse{Court: court}, nil
 }
 
-func (s *CourtService) ListCourtByLocation(ctx context.Context, in *courtpb.ListCourtByLocationRequest) (*courtpb.ListCourtResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListCourtByLocation not implemented")
+func (s *CourtService) ListCourtByLocation(ctx context.Context, in *courtpb.ListCourtByLocationRequest) (*courtpb.CourtsWithDistance, error) {
+	query := `select 
+    c.id,
+	ST_Y(c.coordinate) as latitude,
+	ST_X(c.coordinate) as longitude,
+    c.name,
+    c.address,
+    d.name as district,
+	d.id as districtID,
+	d.cityID as cityID,
+    ST_Distance_Sphere(
+        ST_GeomFromText(?),
+        c.coordinate
+	) as distance
+	from court c 
+	inner join district d on d.id = c.districtID 
+	ORDER BY distance;`
+
+	lat := in.GetLocation().GetLatitude()
+	lng := in.GetLocation().GetLongitude()
+
+	point := fmt.Sprintf("POINT(%f %f)", lng, lat)
+
+	rows, err := s.db.QueryContext(ctx, query, point)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "could not list courts")
+	}
+	defer rows.Close()
+
+	courts := []*courtpb.CourtWithDistance{}
+	for rows.Next() {
+		cwd := &courtpb.CourtWithDistance{}
+		court := &courtpb.Court{}
+		dst := &regionpb.District{}
+		loc := &commonpb.Location{}
+		err := rows.Scan(&court.Id, &loc.Latitude, &loc.Longitude, &court.Name, &court.Address, &dst.Name, &dst.Id, &dst.CityId, &cwd.Distance)
+		court.District = dst
+		court.Location = loc
+		cwd.Court = court
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "could not list courts")
+		}
+		courts = append(courts, cwd)
+	}
+
+	return &courtpb.CourtsWithDistance{Courts: courts}, nil
 }
 
 func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtRequest) (*courtpb.ListCourtResponse, error) {
 	sub_id := getUserIdFromCtx(ctx)
-	// TODO: coordinate serialization'i ekler misin buraya
 	query := `SELECT
 		c.ID,
+		ST_Y(c.coordinate) as latitude,
+		ST_X(c.coordinate) as longitude,
 		c.name,
 		d.ID,
 		d.name,
@@ -108,11 +154,13 @@ func (s *CourtService) SearchCourt(ctx context.Context, in *courtpb.SearchCourtR
 	for rows.Next() {
 		var court courtpb.Court
 		var district regionpb.District
-		err := rows.Scan(&court.Id, &court.Name, &district.Id, &district.Name, &district.CityId, &court.Address, &court.CommentCount, &court.CheckInCount)
+		loc := &commonpb.Location{}
+		err := rows.Scan(&court.Id, &loc.Latitude, &loc.Longitude, &court.Name, &district.Id, &district.Name, &district.CityId, &court.Address, &court.CommentCount, &court.CheckInCount)
 		if err != nil {
 			return nil, gerr(codes.Internal, err)
 		}
 		court.District = &district
+		court.Location = loc
 		court.Media = make([]*commonpb.Media, 0)
 		courts = append(courts, &court)
 	}

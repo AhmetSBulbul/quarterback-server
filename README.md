@@ -53,7 +53,7 @@ Run API binary
 - [?] Add media for court (@AhmetSBulbul)
 - [ ] Comment to game(@AhmetSBulbul)
 - [x] If possible court check-in(pazarlarken is yapar redis varsa ttl'li falan deneriz sunumluk olacak)
-- [ ] Get Courts by location to show on home page and start game screen(@okb)
+- [x] Get Courts by location to show on home page and start game screen(@okb)
 - [ ] Create Game (@okb)
 - [ ] Start Game (@okb)
 - [ ] End Game (@okb)
