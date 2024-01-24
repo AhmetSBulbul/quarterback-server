@@ -28,9 +28,9 @@ type GameServiceClient interface {
 	ListGamesByUser(ctx context.Context, in *ListGamesByUserRequest, opts ...grpc.CallOption) (*ListGamesResponse, error)
 	ListGamesByCourt(ctx context.Context, in *ListGamesByCourtRequest, opts ...grpc.CallOption) (*ListGamesResponse, error)
 	ListGamesByTeam(ctx context.Context, in *ListGamesByTeamRequest, opts ...grpc.CallOption) (*ListGamesResponse, error)
-	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
+	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
 	CreateGameWithTeam(ctx context.Context, in *CreateGameWithTeamRequest, opts ...grpc.CallOption) (*GameResponse, error)
-	JoinGame(ctx context.Context, in *JoinGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
+	JoinGame(ctx context.Context, in *JoinGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
 	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
 	CancelGame(ctx context.Context, in *CancelGameRequest, opts ...grpc.CallOption) (*GameResponse, error)
@@ -91,8 +91,8 @@ func (c *gameServiceClient) ListGamesByTeam(ctx context.Context, in *ListGamesBy
 	return out, nil
 }
 
-func (c *gameServiceClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*GameResponse, error) {
-	out := new(GameResponse)
+func (c *gameServiceClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error) {
+	out := new(GameIdResponse)
 	err := c.cc.Invoke(ctx, "/game.GameService/CreateGame", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -109,8 +109,8 @@ func (c *gameServiceClient) CreateGameWithTeam(ctx context.Context, in *CreateGa
 	return out, nil
 }
 
-func (c *gameServiceClient) JoinGame(ctx context.Context, in *JoinGameRequest, opts ...grpc.CallOption) (*GameResponse, error) {
-	out := new(GameResponse)
+func (c *gameServiceClient) JoinGame(ctx context.Context, in *JoinGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error) {
+	out := new(GameIdResponse)
 	err := c.cc.Invoke(ctx, "/game.GameService/JoinGame", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -163,9 +163,9 @@ type GameServiceServer interface {
 	ListGamesByUser(context.Context, *ListGamesByUserRequest) (*ListGamesResponse, error)
 	ListGamesByCourt(context.Context, *ListGamesByCourtRequest) (*ListGamesResponse, error)
 	ListGamesByTeam(context.Context, *ListGamesByTeamRequest) (*ListGamesResponse, error)
-	CreateGame(context.Context, *CreateGameRequest) (*GameResponse, error)
+	CreateGame(context.Context, *CreateGameRequest) (*GameIdResponse, error)
 	CreateGameWithTeam(context.Context, *CreateGameWithTeamRequest) (*GameResponse, error)
-	JoinGame(context.Context, *JoinGameRequest) (*GameResponse, error)
+	JoinGame(context.Context, *JoinGameRequest) (*GameIdResponse, error)
 	StartGame(context.Context, *StartGameRequest) (*GameResponse, error)
 	EndGame(context.Context, *EndGameRequest) (*GameResponse, error)
 	CancelGame(context.Context, *CancelGameRequest) (*GameResponse, error)
@@ -193,13 +193,13 @@ func (UnimplementedGameServiceServer) ListGamesByCourt(context.Context, *ListGam
 func (UnimplementedGameServiceServer) ListGamesByTeam(context.Context, *ListGamesByTeamRequest) (*ListGamesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGamesByTeam not implemented")
 }
-func (UnimplementedGameServiceServer) CreateGame(context.Context, *CreateGameRequest) (*GameResponse, error) {
+func (UnimplementedGameServiceServer) CreateGame(context.Context, *CreateGameRequest) (*GameIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
 }
 func (UnimplementedGameServiceServer) CreateGameWithTeam(context.Context, *CreateGameWithTeamRequest) (*GameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGameWithTeam not implemented")
 }
-func (UnimplementedGameServiceServer) JoinGame(context.Context, *JoinGameRequest) (*GameResponse, error) {
+func (UnimplementedGameServiceServer) JoinGame(context.Context, *JoinGameRequest) (*GameIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinGame not implemented")
 }
 func (UnimplementedGameServiceServer) StartGame(context.Context, *StartGameRequest) (*GameResponse, error) {

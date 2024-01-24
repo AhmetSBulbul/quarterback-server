@@ -15,6 +15,7 @@ import (
 	"github.com/AhmetSBulbul/quarterback-server/pb/chatpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/courtpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/filepb"
+	"github.com/AhmetSBulbul/quarterback-server/pb/gamepb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/regionpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"github.com/go-playground/validator/v10"
@@ -131,6 +132,7 @@ func NewServer(db *sql.DB) {
 	userpb.RegisterUserServiceServer(s, &UserService{db: db})
 	filepb.RegisterFileServiceServer(s, &FileService{db: db})
 	courtpb.RegisterCourtServiceServer(s, &CourtService{db: db})
+	gamepb.RegisterGameServiceServer(s, &GameService{db: db})
 	chatpb.RegisterChatServiceServer(s, &ChatService{
 		channel: make(map[int32]chan *chatpb.ChatMessage),
 		db:      db,
