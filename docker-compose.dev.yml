@@ -10,7 +10,7 @@ services:
   depends_on:
     - database
   volumes:
-    - ./public:/app/public
+    - ./.volumes/public:/app/public
   environment:
     LISTEN_ADDR: ":50001"
     DB_CONNECTION: "qbsql:152535@tcp(database:3306)/qbsql?parseTime=true"

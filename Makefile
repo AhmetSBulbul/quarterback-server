@@ -51,3 +51,9 @@ up_clean:
 	rm -rf ./.volumes
 	docker-compose up --build -d
 
+docker:
+	docker compose up --build -d
+
+up:
+	docker compose up -d
+

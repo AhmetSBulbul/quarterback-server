@@ -15,7 +15,7 @@ services:
   depends_on:
     - mariadb01
   volumes:
-    - ./public:/app/public
+    - ./.volumes/public:/usr/src/app/public
   # TODO: Fetch from locally mounted env file (remove redundancy)
   environment:
     LISTEN_ADDR: ":50001"
