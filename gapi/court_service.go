@@ -37,7 +37,8 @@ func (s *CourtService) getUserByID(ctx context.Context, userid int) (*userpb.Use
 }
 
 func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest) (*courtpb.CourtResponse, error) {
-	// TODO: get checkins
+	// TODO: get checkins at different endpoint
+	// This code is used on game service
 	query := `SELECT
 		c.ID,
 		c.name,
@@ -90,7 +91,7 @@ func (s *CourtService) ListCourtByLocation(ctx context.Context, in *courtpb.List
 	lat := in.GetLocation().GetLatitude()
 	lng := in.GetLocation().GetLongitude()
 
-	point := fmt.Sprintf("POINT(%f %f)", lng, lat)
+	point := fmt.Sprintf("POINT(%f %f)", lat, lng)
 
 	rows, err := s.db.QueryContext(ctx, query, point)
 	if err != nil {

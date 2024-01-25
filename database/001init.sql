@@ -106,7 +106,7 @@ create table game_player (
 	gameID int not null,
 	playerID int not null,
 	isHomeSide bool default 0,
-	isCancelled bool default 0,
+	isCanceled bool default 0,
 	constraint `cr_game_player_game_fk` foreign key (gameID) references game(ID) on delete cascade,
 	constraint `cr_game_player_player_fk` foreign key (playerID) references user(ID) on delete cascade
 );

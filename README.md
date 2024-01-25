@@ -72,3 +72,4 @@ Not: docker compose dev dosyasinda calisiyorsan production dosyasini da guncelle
 ## MUST HAVE IF WE HAVE PLAN TO MAINTAIN IT
 
 - [ ] Allah rizasi icin katmanlama join atmaktan bileklerim kireclendi.
+- [ ] Understandable and traceable error messages on returns
