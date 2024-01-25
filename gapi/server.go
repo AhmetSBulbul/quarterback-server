@@ -16,6 +16,7 @@ import (
 	"github.com/AhmetSBulbul/quarterback-server/pb/courtpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/filepb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/gamepb"
+	"github.com/AhmetSBulbul/quarterback-server/pb/pointspb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/regionpb"
 	"github.com/AhmetSBulbul/quarterback-server/pb/userpb"
 	"github.com/go-playground/validator/v10"
@@ -137,6 +138,7 @@ func NewServer(db *sql.DB) {
 		channel: make(map[int32]chan *chatpb.ChatMessage),
 		db:      db,
 	})
+	pointspb.RegisterPointsServiceServer(s, &PointsService{db: db})
 
 	lis, err := net.Listen("tcp", os.Getenv("LISTEN_ADDR"))
 	if err != nil {

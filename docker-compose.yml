@@ -25,6 +25,8 @@ services:
      context: ./database
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports: 
+      - "33061:3306"
     # TODO: Fetch from locally mounted env file (remove redundancy)
     environment:
       MYSQL_DATABASE: qbsql

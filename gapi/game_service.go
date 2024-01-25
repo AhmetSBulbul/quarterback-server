@@ -294,7 +294,7 @@ func (s *GameService) ListGamesByUser(ctx context.Context, in *gamepb.ListGamesB
 
 func (s *GameService) ListGamesByCourt(ctx context.Context, in *gamepb.ListGamesByCourtRequest) (*gamepb.ListGamesResponse, error) {
 	query := `SELECT
-		g.id,
+		g.id
 	FROM game g
 	INNER JOIN court c ON g.courtID = c.id
 	WHERE c.id = ? AND g.startedAt IS NOT NULL
@@ -369,6 +369,10 @@ func (s *GameService) CreateGameWithTeam(_ context.Context, _ *gamepb.CreateGame
 
 // Add Comment
 func (s *GameService) AddMedia(_ context.Context, _ *commonpb.File) (*commonpb.Media, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *GameService) mustEmbedUnimplementedGameServiceServer() {
 	panic("not implemented") // TODO: Implement
 }
 
