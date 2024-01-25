@@ -332,6 +332,7 @@ func (s *GameService) ListGamesByCourt(ctx context.Context, in *gamepb.ListGames
 	}, nil
 }
 
+// If everyone leaves game, game will be deleted
 func (s *GameService) LeaveGame(ctx context.Context, in *gamepb.LeaveGameRequest) (*gamepb.GameIdResponse, error) {
 	query := `SELECT startedAt FROM game WHERE id = ?;`
 
