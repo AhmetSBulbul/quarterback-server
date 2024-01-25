@@ -332,6 +332,31 @@ func (s *GameService) ListGamesByCourt(ctx context.Context, in *gamepb.ListGames
 	}, nil
 }
 
+func (s *GameService) LeaveGame(ctx context.Context, in *gamepb.LeaveGameRequest) (*gamepb.GameIdResponse, error) {
+	query := `SELECT startedAt FROM game WHERE id = ?;`
+
+	var startedAt sql.NullTime
+	s.db.QueryRow(query, in.GetGameId()).Scan(&startedAt)
+
+	if startedAt.Valid {
+		return nil, status.Errorf(codes.InvalidArgument, "Game has ended")
+	}
+
+	sub_id := getUserIdFromCtx(ctx)
+
+	query = `DELETE FROM game_player WHERE gameID = ? AND playerID = ?;`
+
+	_, err := s.db.Exec(query, in.GetGameId(), sub_id)
+	if err != nil {
+		fmt.Println(err)
+		return nil, gerr(codes.Internal, err)
+	}
+
+	return &gamepb.GameIdResponse{
+		GameId: in.GetGameId(),
+	}, nil
+}
+
 func (s *GameService) ListGamesByTeam(_ context.Context, _ *gamepb.ListGamesByTeamRequest) (*gamepb.ListGamesResponse, error) {
 	panic("not implemented") // TODO: Implement
 }

@@ -34,6 +34,7 @@ type GameServiceClient interface {
 	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
 	CancelGame(ctx context.Context, in *CancelGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
+	LeaveGame(ctx context.Context, in *LeaveGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error)
 	// Add Comment
 	AddMedia(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*commonpb.Media, error)
 }
@@ -145,6 +146,15 @@ func (c *gameServiceClient) CancelGame(ctx context.Context, in *CancelGameReques
 	return out, nil
 }
 
+func (c *gameServiceClient) LeaveGame(ctx context.Context, in *LeaveGameRequest, opts ...grpc.CallOption) (*GameIdResponse, error) {
+	out := new(GameIdResponse)
+	err := c.cc.Invoke(ctx, "/game.GameService/LeaveGame", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gameServiceClient) AddMedia(ctx context.Context, in *commonpb.File, opts ...grpc.CallOption) (*commonpb.Media, error) {
 	out := new(commonpb.Media)
 	err := c.cc.Invoke(ctx, "/game.GameService/AddMedia", in, out, opts...)
@@ -169,6 +179,7 @@ type GameServiceServer interface {
 	StartGame(context.Context, *StartGameRequest) (*GameIdResponse, error)
 	EndGame(context.Context, *EndGameRequest) (*GameIdResponse, error)
 	CancelGame(context.Context, *CancelGameRequest) (*GameIdResponse, error)
+	LeaveGame(context.Context, *LeaveGameRequest) (*GameIdResponse, error)
 	// Add Comment
 	AddMedia(context.Context, *commonpb.File) (*commonpb.Media, error)
 	mustEmbedUnimplementedGameServiceServer()
@@ -210,6 +221,9 @@ func (UnimplementedGameServiceServer) EndGame(context.Context, *EndGameRequest) 
 }
 func (UnimplementedGameServiceServer) CancelGame(context.Context, *CancelGameRequest) (*GameIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelGame not implemented")
+}
+func (UnimplementedGameServiceServer) LeaveGame(context.Context, *LeaveGameRequest) (*GameIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LeaveGame not implemented")
 }
 func (UnimplementedGameServiceServer) AddMedia(context.Context, *commonpb.File) (*commonpb.Media, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMedia not implemented")
@@ -425,6 +439,24 @@ func _GameService_CancelGame_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameService_LeaveGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).LeaveGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/game.GameService/LeaveGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).LeaveGame(ctx, req.(*LeaveGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GameService_AddMedia_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(commonpb.File)
 	if err := dec(in); err != nil {
@@ -493,6 +525,10 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelGame",
 			Handler:    _GameService_CancelGame_Handler,
+		},
+		{
+			MethodName: "LeaveGame",
+			Handler:    _GameService_LeaveGame_Handler,
 		},
 		{
 			MethodName: "AddMedia",
