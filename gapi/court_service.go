@@ -53,7 +53,7 @@ func (s *CourtService) GetCourt(ctx context.Context, in *courtpb.GetCourtRequest
 	LEFT JOIN court_comment com on com.courtID = c.ID
 	LEFT JOIN checkin on checkin.courtID = c.ID
 	WHERE
-		c.districtId = ?
+		c.ID = ?
 	GROUP BY c.id;`
 	// TODO: no need to group by!
 	court := &courtpb.Court{}
