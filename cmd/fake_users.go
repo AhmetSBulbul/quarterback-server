@@ -34,6 +34,44 @@ func users(db *sql.DB) {
 	}
 }
 
+func games(db *sql.DB) {
+	count := 10
+
+	query := `
+		INSERT INTO game (courtID, startedAt, endedAt, homeScore, awayScore)
+		VALUES (?, ?, ?, ?, ?);
+	`
+
+	for i := 0; i < count; i++ {
+		courtID := gofakeit.Number(1, 9)
+		startedAt := gofakeit.PastDate()
+		endedAt := gofakeit.DateRange(startedAt, time.Now())
+		homeScore := gofakeit.Number(0, 100)
+		awayScore := gofakeit.Number(0, 100)
+		_, err := db.Exec(query, courtID, startedAt, endedAt, homeScore, awayScore)
+		if err != nil {
+			log.Fatalf("[main] database insert error: %v", err.Error())
+		}
+		log.Printf("[main] %v. game created", i+1)
+	}
+
+	count = 40
+	query = `INSERT INTO game_player (gameID, playerID, isHomeSide, isCanceled) VALUES (?, ?, ?, ?);`
+
+	for i := 0; i < count; i++ {
+		gameID := gofakeit.Number(1, 10)
+		playerID := gofakeit.Number(1, 10)
+		isHomeSide := gofakeit.Bool()
+		isCanceled := gofakeit.Bool()
+		_, err := db.Exec(query, gameID, playerID, isHomeSide, isCanceled)
+		if err != nil {
+			log.Fatalf("[main] database insert error: %v", err.Error())
+		}
+		log.Printf("[main] %v. game_player created", i+1)
+	}
+
+}
+
 func main() {
 	godotenv.Load()
 	db, err := sql.Open("mysql", os.Getenv("DB_CONNECTION"))
@@ -43,4 +81,5 @@ func main() {
 	db.SetConnMaxLifetime(time.Minute)
 
 	users(db)
+	games(db)
 }
