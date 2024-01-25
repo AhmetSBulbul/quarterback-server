@@ -82,12 +82,12 @@ func streamInterceptor(srv any, ss grpc.ServerStream, info *grpc.StreamServerInf
 	// TODO: doesn't work
 
 	if !ok {
-		return gerr(codes.InvalidArgument, fmt.Errorf("Stram Interceptor Context Error"))
+		return gerr(codes.InvalidArgument, fmt.Errorf("cannot get metadata"))
 	}
 
 	id, ok := valid(md["authorization"])
 	if !ok {
-		return gerr(codes.Unauthenticated, fmt.Errorf("Error on valid check at stream interceptor"))
+		return gerr(codes.Unauthenticated, fmt.Errorf("cannot get authorization header"))
 	}
 
 	ctx := context.WithValue(ss.Context(), Sub_id("sub_id"), id)

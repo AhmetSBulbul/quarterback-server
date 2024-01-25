@@ -278,10 +278,6 @@ func (s *CourtService) ListComment(ctx context.Context, in *courtpb.CourtComment
 	}, nil
 }
 
-func (s *CourtService) mustEmbedUnimplementedCourtServiceServer() {
-	panic("not implemented") // TODO: Implement
-}
-
 // select * from checkin where createdAt > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 20 MINUTE);
 // select u.id, u.email, u.districtID, u.name, u.lastName, u.username, f.path, com.content from court_comment as com inner join user u on u.id = com.senderID left join file f on u.avatarID = f.ID where courtID = 1;
 

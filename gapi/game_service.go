@@ -371,10 +371,6 @@ func (s *GameService) AddMedia(_ context.Context, _ *commonpb.File) (*commonpb.M
 	panic("not implemented") // TODO: Implement
 }
 
-func (s *GameService) mustEmbedUnimplementedGameServiceServer() {
-	panic("not implemented") // TODO: Implement
-}
-
 // End of generated code
 
 // Will be in repository

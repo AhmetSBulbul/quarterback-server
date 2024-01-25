@@ -99,7 +99,3 @@ func (s *ChatService) SendMessage(ctx context.Context, msg *chatpb.ChatMessageRe
 
 	return new_msg, nil
 }
-
-func (s *ChatService) mustEmbedUnimplementedChatServiceServer() {
-	panic("not implemented") // TODO: Implement
-}
