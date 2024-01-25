@@ -1,7 +1,7 @@
-volumes
-.volumes
+# volumes
+# .volumes
 bin
 .env
 .DS_Store
 vendor
-public
+# public

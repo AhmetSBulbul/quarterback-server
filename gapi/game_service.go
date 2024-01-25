@@ -148,6 +148,7 @@ func (s *GameService) EndGame(ctx context.Context, in *gamepb.EndGameRequest) (*
 }
 
 func (s *GameService) CancelGame(ctx context.Context, in *gamepb.CancelGameRequest) (*gamepb.GameIdResponse, error) {
+	sub_id := getUserIdFromCtx(ctx)
 	query := `SELECT endedAt FROM game WHERE id = ?;`
 
 	var endedAt sql.NullTime
@@ -157,8 +158,8 @@ func (s *GameService) CancelGame(ctx context.Context, in *gamepb.CancelGameReque
 		return nil, status.Errorf(codes.InvalidArgument, "Game has not ended")
 	}
 
-	query = "UPDATE game_player SET isCanceled = 1 WHERE gameID = ?;"
-	_, err := s.db.ExecContext(ctx, query, in.GetGameId())
+	query = "UPDATE game_player SET isCanceled = 1 WHERE gameID = ? AND playerID = ?;"
+	_, err := s.db.ExecContext(ctx, query, in.GetGameId(), sub_id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, gerr(codes.Internal, err)
