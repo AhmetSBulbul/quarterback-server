@@ -57,3 +57,5 @@ docker:
 up:
 	docker compose up -d
 
+seed:
+	go run cmd/fake_users.go

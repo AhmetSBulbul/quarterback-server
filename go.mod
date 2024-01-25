@@ -3,6 +3,7 @@ module github.com/AhmetSBulbul/quarterback-server
 go 1.21.1
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
