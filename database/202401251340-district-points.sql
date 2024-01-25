@@ -11,8 +11,9 @@ select
     game_player.isHomeSide as isHomeSide,
     (homeScore - awayScore) > 0 as homeWin,
     (awayScore - homeScore) > 0 as awayWin,
-    game_player.isHomeSide > 0 = ((homeScore - awayScore) > 0) as isWin
+    game_player.isHomeSide > 0 = ((homeScore - awayScore) > 0) as isWin,
+    game_player.isHomeSide > 0 = ((awayScore - homeScore) > 0) as isLoss
     from game
     inner join game_player on game.ID = game_player.gameID
     inner join user u ON u.ID = game_player.playerID
-    inner join district on u.districtID = district.id
+    inner join district on u.districtID = district.id;
