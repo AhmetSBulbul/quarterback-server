@@ -313,9 +313,8 @@ func (s *UserService) AddComment(ctx context.Context, in *commonpb.CommentReques
 }
 
 func (s *UserService) GetFollowers(ctx context.Context, in *commonpb.GetByIdPaginatedRequest) (*userpb.UserListResponse, error) {
-	// Only pussies uses pagination
 	// isFollower and isFollowing will be checked on client side. So due of that we don't use pagination here.
-	// Maybe later
+	// But we will!
 	query := `SELECT
 		u.id,
 		u.email,
